@@ -11,6 +11,12 @@ sources = [
     'rs232.cc'
 ]
 
+if host_machine.system() == 'windows'
+    sources += 'rs232_win.cc'
+else
+    sources += 'rs232_linux.cc'
+endif
+
 incdir = include_directories('.')
 
 rs232 = library(

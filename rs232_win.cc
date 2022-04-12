@@ -10,9 +10,6 @@
 ***************************************************************************
 */
 
-#ifndef RS232_WIN_CPP
-#define RS232_WIN_CPP
-
 #include "rs232.hpp"
 
 #include "stdio.h"
@@ -144,6 +141,3 @@ int kfx::RS232::IsCTSEnabled()
   GetCommModemStatus(Cport, (LPDWORD)((void *)&status));
   return (status & MS_CTS_ON)? 1 : 0;
 }
-
-#endif // RS232_WIN_CPP
-
