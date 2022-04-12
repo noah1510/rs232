@@ -11,3 +11,4 @@
 
 # Qt-crator project
 *.pro*
+*.kdev4*

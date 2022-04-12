@@ -13,7 +13,7 @@
 #ifndef kranfix_rs2323_rs232_linux_cc
 #define kranfix_rs2323_rs232_linux_cc
 
-#include "rs232.h"
+#include "rs232.hpp"
 
 static int error;
 static struct termios nps;
