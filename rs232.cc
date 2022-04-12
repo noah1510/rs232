@@ -15,7 +15,6 @@
 
 #include "rs232.hpp"
 
-#else
 #  ifdef __linux__
 #    include "rs232_linux.cc"
 #  else
@@ -23,9 +22,16 @@
 #  endif // __linux__
 
 // Sends a string to serial port till finding a '\0'
-void kfx::RS232::Print(const char *text)
-{
+void kfx::RS232::Print(const char *text){
   while(*text != 0) Write( *(text++) );
+}
+
+int kfx::RS232::IsAvailable() {
+    return available;
+}
+
+const std::string& kfx::RS232::GetDeviceName() { 
+    return devname;
 }
 
 #endif // kranfix_rs232_rs232_cc

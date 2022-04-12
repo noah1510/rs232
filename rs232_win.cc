@@ -15,13 +15,16 @@
 
 #include "rs232.hpp"
 
+#include "stdio.h"
+#include "string.h"
+
 static int valid_baudrates[] = {110, 300, 600, 1200, 2400, 4800,
         9600, 19200, 38400, 57600, 115200, 128000, 256000};
 
-kfx::RS232::RS232(char * dev_name, int baudrate)
+kfx::RS232::RS232(const std::string& deviceName, int baudrate)
 {
   // Device name
-  strcpy(devname,dev_name);
+  devname = deviceName;
 
   // Looks for a valid baurate
   int i;
@@ -40,7 +43,7 @@ kfx::RS232::RS232(char * dev_name, int baudrate)
     return 1;
   }
 
-  Cport = CreateFileA(devname,
+  Cport = CreateFileA(devname.c_str(),
                       GENERIC_READ|GENERIC_WRITE,
                       0,                          /* no share  */
                       NULL,                       /* no security */

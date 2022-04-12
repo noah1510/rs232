@@ -14,18 +14,19 @@
 #define kranfix_rs2323_rs232_linux_cc
 
 #include "rs232.hpp"
+#include "stdio.h"
+#include "string.h"
 
 static int error;
 static struct termios nps;
 
-kfx::RS232::RS232(char * dev_name, int baudrate) : available(false)
-{
+kfx::RS232::RS232(const std::string& deviceName, int baudrate) : available(false){
+    
   // asigning device name
-  strcpy(devname,dev_name);
+  devname = deviceName;
 
   // Chossing baudrate
-  switch(baudrate)
-  {
+  switch(baudrate){
     case      50 : baudr = B50;       break;
     case      75 : baudr = B75;       break;
     case     110 : baudr = B110;      break;
@@ -53,9 +54,9 @@ kfx::RS232::RS232(char * dev_name, int baudrate) : available(false)
                    return ;
   }
 
-  port = open(devname, O_RDWR | O_NOCTTY | O_NDELAY);
-  if(port == -1)
-  {
+  
+  port = open(devname.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+  if(port == -1){
     perror("unable to open comport ");
     return;
   }
