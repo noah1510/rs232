@@ -7,8 +7,10 @@
 *.dll
 
 # Build Directory
-.build
+build
 
-# Qt-crator project
+# ide folders and files
 *.pro*
 *.kdev4*
+.vscode
+.cache
