@@ -24,3 +24,7 @@ bool kfx::RS232::IsAvailable() const{
 std::string_view kfx::RS232::GetDeviceName() const{ 
     return devname;
 }
+
+kfx::RS232::~RS232(){
+  Close();
+}

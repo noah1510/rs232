@@ -81,10 +81,18 @@ kfx::RS232::RS232(const std::string& deviceName, int baudrate) : devname(deviceN
 }
 
 int kfx::RS232::Read(unsigned char byte){
+    if (!available){
+        return -1;
+    }
+
     return read(port, &byte, 1);
 }
 
 int kfx::RS232::Read(unsigned char *buf, int size){
+    if (!available){
+        return -1;
+    }
+
     #ifndef __STRICT_ANSI__                       /* __STRICT_ANSI__ is defined when the -ansi option is used for gcc */
         if(size > SSIZE_MAX)  size = (int)SSIZE_MAX;  /* SSIZE_MAX is defined in limits.h */
     #else
@@ -95,14 +103,23 @@ int kfx::RS232::Read(unsigned char *buf, int size){
 }
 
 int kfx::RS232::Write(unsigned char byte){
+    if (!available){
+        return -1;
+    }
+
     return write(port, &byte, 1);
 }
 
 int kfx::RS232::Write(unsigned char *buf, int size){
+    if (!available){
+        return -1;
+    }
+
     return write(port, buf, size);
 }
 
 void kfx::RS232::Close(){
+    available = false;
     close(port);
     tcsetattr(port, TCSANOW, &ops);
 }

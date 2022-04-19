@@ -63,7 +63,21 @@ namespace kfx {
         bool available;
         struct termios ops; // old port settings
     public:
+        /**
+         * @brief Construct a new RS232 object
+         * 
+         * @param deviceName The name of the port where the device is connected to
+         * @param baudRate The baud rate that should be used for the connection
+         */
         RS232(const std::string& deviceName, int baudRate);
+
+        /**
+         * @brief Destroy the RS232.
+         * This function calls the Close() function automatically to leave the port in a valid state.
+         * 
+         */
+        ~RS232();
+
         /**
          * @brief Checks if the connection was started sucessfully
          * 
@@ -81,7 +95,11 @@ namespace kfx {
         int Read(unsigned char *, int);
         int Write(unsigned char);
         int Write(unsigned char *, int);
-        void Print(const char *);
+        /**
+         * @brief close the connection to the device.
+         * @warning this disables all following transactions to the device.
+         * 
+         */
         void Close();
         int IsCTSEnabled();
     };
