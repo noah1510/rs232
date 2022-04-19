@@ -87,6 +87,25 @@ rs232_dep = declare_dependency(
     version: meson.project_version(),
 )
 
+if get_option('build_sample')
+    sample_src = []
+    if host_machine.system() == 'windows'
+        message('No sample for windows exists yet! Feel free to open a merge request to add one.')
+    else
+        sample_src += 'sample_linux'
+    endif
+
+    foreach sample_program : sample_src
+
+    exe = executable(
+        sample_program, 
+        'samples/' + sample_program + '.cpp',
+        dependencies: rs232_dep
+    )
+endforeach
+
+endif
+
 # this allows the library to be found by pkg config if you want to have a system installation
 pkg = import('pkgconfig')
 pkg.generate(rs232)

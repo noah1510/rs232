@@ -1,17 +1,17 @@
-#include "rs232.h"
+#include "rs232.hpp"
 #include <iostream>
 
-using namespace std;
 using namespace kfx;
 
 int main () {
-    char serialPort[] = "/dev/ttyUSB0";
+    const std::string serialPort = "/dev/ttyUSB0";
     int baudrate = 9600;
     
-    
     RS232 h{serialPort,baudrate};
+
     if(!h.IsAvailable()){
-        cout << "Serial port %s is not available" << serialPort << endl;
+        std::cerr << "Serial port " << h.GetDeviceName() << " is not available!" << std::endl;
+        return -1;
     }
 
     // Sending a Character
@@ -20,15 +20,15 @@ int main () {
     // Reciving a buffer
     unsigned char buf[30];
     h.Read(buf,22);
-    cout << buf << endl;
+    std::cout << buf << std::endl;
 
     // Sending a buffer
     h.Print("Hello!");
     h.Read(buf,22);
-    cout << buf << endl;
+    std::cout << buf << std::endl;
 
     // Closing port
-    cout << "\nClosing Serialport ..." << endl;
+    std::cout << "\nClosing Serialport ..." << std::endl;
     h.Close();
 
     return 0;
