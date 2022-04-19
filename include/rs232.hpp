@@ -62,7 +62,11 @@ namespace kfx {
 
         int baudr, port;    // Baudrate and Port Number
         bool available;
-        struct termios ops; // old port settings
+
+        #ifdef __unix__
+            struct termios ops; // old port settings
+        #endif 
+        
     public:
         /**
          * @brief Construct a new RS232 object
@@ -96,7 +100,7 @@ namespace kfx {
         int Read(unsigned char *, int);
         int Write(unsigned char);
         int Write(unsigned char *, int);
-        
+
         void Print(const std::string& text);
 
         /**
