@@ -13,8 +13,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
-#ifdef __linux__
+#ifdef __unix__
 
     #include <termios.h>
     #include <sys/ioctl.h>
@@ -32,7 +33,7 @@
 
 namespace kfx {
 
-    #  ifdef __linux__
+    #  ifdef __unix__
         const std::string Comports[] = {"/dev/ttyACM0",
             "/dev/ttyS1", "/dev/ttyS2", "/dev/ttyS3",
             "/dev/ttyS4", "/dev/ttyS5", "/dev/ttyS6",
@@ -95,6 +96,9 @@ namespace kfx {
         int Read(unsigned char *, int);
         int Write(unsigned char);
         int Write(unsigned char *, int);
+        
+        void Print(const std::string& text);
+
         /**
          * @brief close the connection to the device.
          * @warning this disables all following transactions to the device.

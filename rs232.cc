@@ -13,8 +13,14 @@
 #include "rs232.hpp"
 
 // Sends a string to serial port till finding a '\0'
-void kfx::RS232::Print(const char *text){
-  while(*text != 0) Write( *(text++) );
+void kfx::RS232::Print(const std::string& text){
+    if (!available){
+        return;
+    }
+
+    for(unsigned char c : text){
+        Write(c);
+    }
 }
 
 bool kfx::RS232::IsAvailable() const{

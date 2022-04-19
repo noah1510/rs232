@@ -1,4 +1,4 @@
-/*
+﻿/*
 ***********************************************
 *
 * Author: Frank Andre Moreno Vera
@@ -14,7 +14,6 @@
 #include "stdio.h"
 #include "string.h"
 
-static int error;
 static struct termios nps;
 
 kfx::RS232::RS232(const std::string& deviceName, int baudrate) : devname(deviceName), available(false){
@@ -54,7 +53,7 @@ kfx::RS232::RS232(const std::string& deviceName, int baudrate) : devname(deviceN
         return;
     }
 
-    error = tcgetattr(port, &ops);
+    int error = tcgetattr(port, &ops);
     if(error == -1){
         close(port);
         perror("unable to read portsettings ");
