@@ -51,14 +51,32 @@ namespace kfx {
     #  endif
 
     class RS232{
-        std::string devname;   // Device Name
+    private:
+        /**
+         * @brief The name of the connected port.
+         * This vairable is const to prevent accidental changes during the lifetime of the object
+         * 
+         */
+        const std::string devname;
+
         int baudr, port;    // Baudrate and Port Number
         bool available;
         struct termios ops; // old port settings
     public:
         RS232(const std::string& deviceName, int baudRate);
-        int IsAvailable();
-        const std::string& GetDeviceName();
+        /**
+         * @brief Checks if the connection was started sucessfully
+         * 
+         * @return true the connection is established as expected
+         * @return false there was an error while initializing the connection or some of the settings are not valid
+         */
+        bool IsAvailable() const;
+
+        /**
+         * @brief Get the name of the port used for this RS232 connection
+         */
+        std::string_view GetDeviceName() const;
+
         int Read(unsigned char);
         int Read(unsigned char *, int);
         int Write(unsigned char);

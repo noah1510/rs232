@@ -1,4 +1,4 @@
-﻿/*
+/*
 ***********************************************
 *
 * Author: Frank Andre Moreno Vera
@@ -17,10 +17,7 @@
 static int error;
 static struct termios nps;
 
-kfx::RS232::RS232(const std::string& deviceName, int baudrate) : available(false){
-        
-    // asigning device name
-    devname = deviceName;
+kfx::RS232::RS232(const std::string& deviceName, int baudrate) : devname(deviceName), available(false){
 
     // Chossing baudrate
     switch(baudrate){

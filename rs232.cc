@@ -17,10 +17,10 @@ void kfx::RS232::Print(const char *text){
   while(*text != 0) Write( *(text++) );
 }
 
-int kfx::RS232::IsAvailable() {
+bool kfx::RS232::IsAvailable() const{
     return available;
 }
 
-const std::string& kfx::RS232::GetDeviceName() { 
+std::string_view kfx::RS232::GetDeviceName() const{ 
     return devname;
 }
