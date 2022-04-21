@@ -20,7 +20,7 @@
 sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate)
 {
   // Device name
-  devname = deviceName;
+  devname = deviceName.c_str();
 
   int baudr = baudrate;
   sprintf(baudr_conf, "baud=%d data=8 parity=N stop=1",baudrate);

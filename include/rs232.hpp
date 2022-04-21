@@ -23,7 +23,7 @@
 
 namespace sakurajin {
 
-    #ifdef __unix__
+    #if defined(unix) || defined(__unix__) || defined(__unix)
         enum Baudrate{
             baud50 = B50,
             baud75 = B75,
@@ -79,7 +79,7 @@ namespace sakurajin {
         int r, port;    // Baudrate and Port Number
         bool available;
 
-        #ifdef __unix__
+        #if defined(unix) || defined(__unix__) || defined(__unix)
             struct termios ops; // old port settings
         #endif 
         
