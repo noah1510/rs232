@@ -18,16 +18,6 @@
 #ifdef __unix__
 
     #include <termios.h>
-    #include <sys/ioctl.h>
-    #include <unistd.h>
-    #include <fcntl.h>
-    #include <sys/types.h>
-    #include <sys/stat.h>
-    #include <limits.h>
-
-#else
-
-    #include <windows.h>
 
 #endif
 

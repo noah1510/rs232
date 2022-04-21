@@ -11,8 +11,17 @@
 */
 
 #include "rs232.hpp"
+
 #include "stdio.h"
 #include "string.h"
+
+
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <limits.h>
 
 static struct termios nps;
 
