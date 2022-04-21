@@ -17,30 +17,13 @@
 
 #include <windows.h>
 
-static int valid_baudrates[] = {110, 300, 600, 1200, 2400, 4800,
-        9600, 19200, 38400, 57600, 115200, 128000, 256000};
-
-kfx::RS232::RS232(const std::string& deviceName, int baudrate)
+kfx::RS232::RS232(const std::string& deviceName, Baudrate baudrate)
 {
   // Device name
   devname = deviceName;
 
-  // Looks for a valid baurate
-  int i;
-  for (i = 0; i  < 13 && baudrate == valid_baudrates[i]; i++)
-    break;
-
-  char baudr_conf[64];
-  if (i < 13)
-  {
-    baudr = baudrate;
-    sprintf(baudr_conf, "baud=%d data=8 parity=N stop=1",baudrate);
-  }
-  else
-  {
-    printf("invalid baudrate\n");
-    return 1;
-  }
+  int baudr = baudrate;
+  sprintf(baudr_conf, "baud=%d data=8 parity=N stop=1",baudrate);
 
   Cport = CreateFileA(devname.c_str(),
                       GENERIC_READ|GENERIC_WRITE,

@@ -5,9 +5,8 @@ using namespace kfx;
 
 int main () {
     const std::string serialPort = "/dev/ttyUSB0";
-    int baudrate = 9600;
     
-    RS232 h{serialPort,baudrate};
+    RS232 h{serialPort,baud9600};
 
     if(!h.IsAvailable()){
         std::cerr << "Serial port " << h.GetDeviceName() << " is not available!" << std::endl;

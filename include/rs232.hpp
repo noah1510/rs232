@@ -23,6 +23,50 @@
 
 namespace kfx {
 
+    #ifdef __unix__
+        enum Baudrate{
+            baud50 = B50,
+            baud75 = B75,
+            baud110 = B110,
+            baud134 = B134,
+            baud150 = B150,
+            baud200 = B200,
+            baud300 = B300,
+            baud600 = B600,
+            baud1200 = B1200,
+            baud1800 = B1800,
+            baud2400 = B2400,
+            baud4800 = B4800,
+            baud9600 = B9600,
+            baud19200 = B19200,
+            baud38400 = B38400,
+            baud57600 = B57600,
+            baud115200 = B115200,
+            baud230400 = B230400,
+            baud460800 = B460800,
+            baud500000 = B500000,
+            baud576000 = B576000,
+            baud921600 = B921600,
+            baud1000000 = B1000000
+        };
+    #else
+        enum Baudrate{
+            baud110 = 110,
+            baud300 = 300,
+            baud600 = 600,
+            baud1200 = 1200,
+            baud2400 = 2400,
+            baud4800 = 4800,
+            baud9600 = 9600,
+            baud19200 = 19200,
+            baud38400 = 38400,
+            baud57600 = 57600,
+            baud115200 = 115200,
+            baud128000 = 128000,
+            baud256000 = 256000
+        };
+    #endif
+
     class RS232{
     private:
         /**
@@ -32,7 +76,7 @@ namespace kfx {
          */
         const std::string devname;
 
-        int baudr, port;    // Baudrate and Port Number
+        int r, port;    // Baudrate and Port Number
         bool available;
 
         #ifdef __unix__
@@ -44,9 +88,9 @@ namespace kfx {
          * @brief Construct a new RS232 object
          * 
          * @param deviceName The name of the port where the device is connected to
-         * @param baudRate The baud rate that should be used for the connection
+         * @param Rate The  rate that should be used for the connection
          */
-        RS232(const std::string& deviceName, int baudRate);
+        RS232(const std::string& deviceName, Baudrate Rate);
 
         /**
          * @brief Destroy the RS232.
