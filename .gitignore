@@ -8,6 +8,7 @@
 
 # Build Directory
 build
+doc
 
 # ide folders and files
 *.pro*
