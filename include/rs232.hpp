@@ -21,7 +21,7 @@
 
 #endif
 
-namespace kfx {
+namespace sakurajin {
 
     #ifdef __unix__
         enum Baudrate{

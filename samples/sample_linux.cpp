@@ -1,7 +1,7 @@
 #include "rs232.hpp"
 #include <iostream>
 
-using namespace kfx;
+using namespace sakurajin;
 
 int main () {
     const std::string serialPort = "/dev/ttyUSB0";

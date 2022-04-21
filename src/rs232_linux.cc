@@ -23,7 +23,7 @@
 #include <sys/stat.h>
 #include <limits.h>
 
-kfx::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devname(deviceName), available(false){
+sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devname(deviceName), available(false){
 
     // Chossing baudrate
     unsigned int baudr = baudrate;
@@ -62,7 +62,7 @@ kfx::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devname(de
     available = true;
 }
 
-int kfx::RS232::Read(unsigned char byte){
+int sakurajin::RS232::Read(unsigned char byte){
     if (!available){
         return -1;
     }
@@ -70,7 +70,7 @@ int kfx::RS232::Read(unsigned char byte){
     return read(port, &byte, 1);
 }
 
-int kfx::RS232::Read(unsigned char *buf, int size){
+int sakurajin::RS232::Read(unsigned char *buf, int size){
     if (!available){
         return -1;
     }
@@ -84,7 +84,7 @@ int kfx::RS232::Read(unsigned char *buf, int size){
     return read(port, buf, size);
 }
 
-int kfx::RS232::Write(unsigned char byte){
+int sakurajin::RS232::Write(unsigned char byte){
     if (!available){
         return -1;
     }
@@ -92,7 +92,7 @@ int kfx::RS232::Write(unsigned char byte){
     return write(port, &byte, 1);
 }
 
-int kfx::RS232::Write(unsigned char *buf, int size){
+int sakurajin::RS232::Write(unsigned char *buf, int size){
     if (!available){
         return -1;
     }
@@ -100,7 +100,7 @@ int kfx::RS232::Write(unsigned char *buf, int size){
     return write(port, buf, size);
 }
 
-void kfx::RS232::Close(){
+void sakurajin::RS232::Close(){
     available = false;
     close(port);
     tcsetattr(port, TCSANOW, &ops);
@@ -121,7 +121,7 @@ TIOCM_RNG   RNG (ring)
 TIOCM_RI    Synonym for TIOCM_RNG
 TIOCM_DSR   DSR (data set ready)
 */
-int kfx::RS232::IsCTSEnabled(){
+int sakurajin::RS232::IsCTSEnabled(){
     int status;
     status = ioctl(port, TIOCMGET, &status);
     return (status & TIOCM_CTS)? 1 : 0;

@@ -13,7 +13,7 @@
 #include "rs232.hpp"
 
 // Sends a string to serial port till finding a '\0'
-void kfx::RS232::Print(const std::string& text){
+void sakurajin::RS232::Print(const std::string& text){
     if (!available){
         return;
     }
@@ -23,14 +23,14 @@ void kfx::RS232::Print(const std::string& text){
     }
 }
 
-bool kfx::RS232::IsAvailable() const{
+bool sakurajin::RS232::IsAvailable() const{
     return available;
 }
 
-std::string_view kfx::RS232::GetDeviceName() const{ 
+std::string_view sakurajin::RS232::GetDeviceName() const{ 
     return devname;
 }
 
-kfx::RS232::~RS232(){
+sakurajin::RS232::~RS232(){
   Close();
 }

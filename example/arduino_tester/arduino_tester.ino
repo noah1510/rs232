@@ -7,18 +7,18 @@ void setup() {
 void loop() {
   while(!Serial.available());
 
-  // Testing kfx::RS232::WriteByte
+  // Testing sakurajin::RS232::WriteByte
   byte a = Serial.read();
 
-  // Testing kfx::RS232::ReadBuf
+  // Testing sakurajin::RS232::ReadBuf
   Serial.print("Recived Character: ");
 
-  // Testing kfx::RS232::ReadByte
+  // Testing sakurajin::RS232::ReadByte
   //Serial.println(a);
   Serial.write(a);
   Serial.println();
 
-  // Testing kfx::RS232::WriteBuf
+  // Testing sakurajin::RS232::WriteBuf
   char A[80];
   int cont = 0;
   while(!Serial.available());
