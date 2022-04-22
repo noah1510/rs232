@@ -109,3 +109,5 @@ endif
 # this allows the library to be found by pkg config if you want to have a system installation
 pkg = import('pkgconfig')
 pkg.generate(rs232)
+
+meson.override_dependency('rs232', rs232_dep)

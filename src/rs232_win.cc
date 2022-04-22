@@ -20,7 +20,7 @@
 sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate)
 {
   // Device name
-  devname = deviceName.c_str();
+  devname = deviceName;
 
   int baudr = baudrate;
   sprintf(baudr_conf, "baud=%d data=8 parity=N stop=1",baudrate);
@@ -36,7 +36,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate)
   if(Cport == INVALID_HANDLE_VALUE)
   {
     printf("unable to open comport\n");
-    return 1;
+    return;
   }
 
   DCB port_settings;
@@ -47,14 +47,14 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate)
   {
     printf("unable to set comport dcb settings\n");
     CloseHandle(Cport);
-    return(1);
+    return;
   }
 
   if(!SetCommState(Cport, &port_settings))
   {
     printf("unable to set comport cfg settings\n");
     CloseHandle(Cport);
-    return 1;
+    return;
   }
 
   COMMTIMEOUTS Cptimeouts;
@@ -69,10 +69,10 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate)
   {
     printf("unable to set comport time-out settings\n");
     CloseHandle(Cport);
-    return(1);
+    return;
   }
 
-  return(0);
+  return;
 }
 
 int sakurajin::RS232::Read(unsigned char byte)

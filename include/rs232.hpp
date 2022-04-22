@@ -15,7 +15,7 @@
 #include <string>
 #include <string_view>
 
-#ifdef __unix__
+#ifdef defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 
     #include <termios.h>
 
@@ -23,7 +23,7 @@
 
 namespace sakurajin {
 
-    #if defined(unix) || defined(__unix__) || defined(__unix)
+    #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
         enum Baudrate{
             baud50 = B50,
             baud75 = B75,
