@@ -18,6 +18,7 @@ jobs:
           action: test
           directory: build
           options: --verbose
+          meson-version: 0.61.3
       - name: clearing build directory
         run: rm -rf build
 
@@ -33,6 +34,7 @@ jobs:
           action: test
           directory: build
           options: --verbose
+          meson-version: 0.61.3
           setup-options: -Ddefault_library=static -Db_lto=false
       - name: clearing build directory
         run: Remove-Item -recurse -force build
@@ -48,6 +50,7 @@ jobs:
         with:
           action: test
           directory: build
+          meson-version: 0.61.3
           options: --verbose
       - name: clearing build directory
         run: rm -rf build
