@@ -14,6 +14,7 @@
 
 #include <string>
 #include <string_view>
+#include <tuple>
 
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 
@@ -116,6 +117,9 @@ namespace sakurajin {
         int Read(unsigned char *, int);
         int Write(unsigned char);
         int Write(unsigned char *, int);
+        
+        std::tuple<unsigned char, int> ReadNextChar();
+        std::tuple<std::string, int> ReadNextMessage();
 
         void Print(const std::string& text);
 
