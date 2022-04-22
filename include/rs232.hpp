@@ -15,7 +15,7 @@
 #include <string>
 #include <string_view>
 
-#ifdef defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+#if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 
     #include <termios.h>
 
