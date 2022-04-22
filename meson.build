@@ -90,7 +90,9 @@ rs232_dep = declare_dependency(
 )
 
 if get_option('build_sample')
-    sample_src = []
+    sample_src = [
+        'interfaceTest'
+    ]
     if host_machine.system() == 'windows'
         message('No sample for windows exists yet! Feel free to open a merge request to add one.')
     else
