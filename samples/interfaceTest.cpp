@@ -3,8 +3,19 @@
 
 using namespace sakurajin;
 
+void printNextBuffer(RS232& h){
+    auto buffer = h.ReadNextMessage();
+    
+    if(std::get<1>(buffer) < 0){
+        std::cerr << "Error while reading the buffer" << std::endl;
+    }else{
+        std::cout << std::get<0>(buffer) ;
+    }
+}
+
 int main (int argc, char **argv) {
 
+    // get the port form the parameter or set the default value
     std::string serialPort = "";
 
     if(argc == 2){
@@ -17,6 +28,7 @@ int main (int argc, char **argv) {
         #endif
     }
     
+    // create the rs232 handle and check if the connection worked
     RS232 h{serialPort,baud19200};
 
     if(!h.IsAvailable()){
@@ -24,17 +36,17 @@ int main (int argc, char **argv) {
         return -1;
     }
 
-    // Reciving a buffer
-    auto buffer = h.ReadNextMessage();
+    // start the communication
+    h.Print("start");
+
+    // read the first message
+    printNextBuffer(h);
     
-    if(std::get<1>(buffer) < 0){
-        std::cerr << "Error while reading the buffer" << std::endl;
-    }else{
-        std::cout << std::get<0>(buffer) ;
-    }
-    
-    
-    std::cout << std::endl;
+    //send a message to the arduino
+    h.Print("Hello from the other side!");
+
+    //get the response from the arduino
+    printNextBuffer(h);
 
     // Closing port
     std::cout << "\nClosing Serialport ..." << std::endl;

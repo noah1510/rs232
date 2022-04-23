@@ -57,7 +57,7 @@ std::tuple<std::string, int> sakurajin::RS232::ReadNextMessage(){
     
     std::string message = "";
     int errCode = 0;
-    unsigned char nextChar = '\0';
+    unsigned char nextChar = '\n';
         
     do{
         std::tie(nextChar, errCode) = ReadNextChar();
@@ -67,7 +67,7 @@ std::tuple<std::string, int> sakurajin::RS232::ReadNextMessage(){
         }
         message += nextChar;
         
-    }while(nextChar != '\0' && nextChar != '\n' && nextChar != '\r');
+    }while(nextChar != '\n');
     
     return {message,0};
 }
