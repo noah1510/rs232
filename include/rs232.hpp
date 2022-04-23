@@ -20,6 +20,8 @@
 
     #include <termios.h>
 
+#else
+    #include <windows.h>
 #endif
 
 namespace sakurajin {
@@ -82,7 +84,9 @@ namespace sakurajin {
 
         #if defined(unix) || defined(__unix__) || defined(__unix)
             struct termios ops; // old port settings
-        #endif 
+        #else
+            HANDLE Cport;
+        #endif
         
     public:
         /**
@@ -113,9 +117,7 @@ namespace sakurajin {
          */
         std::string_view GetDeviceName() const;
 
-        int Read(unsigned char);
         int Read(unsigned char *, int);
-        int Write(unsigned char);
         int Write(unsigned char *, int);
         
         std::tuple<unsigned char, int> ReadNextChar();

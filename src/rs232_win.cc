@@ -75,13 +75,6 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate)
   return;
 }
 
-int sakurajin::RS232::Read(unsigned char byte)
-{
-  int n;
-  ReadFile(Cport, byte, 1, (LPDWORD)((void *)&n), NULL);
-  return n;
-}
-
 int sakurajin::RS232::Read(unsigned char *buf, int size)
 {
   int n;
@@ -96,11 +89,6 @@ int sakurajin::RS232::Read(unsigned char *buf, int size)
   return n;
 }
 
-int sakurajin::RS232::Write(int comport_number, unsigned char byte)
-{
-  int n;
-  WriteFile(Cport, &byte, 1, (LPDWORD)((void *)&n), NULL);
-  return (n < 0)? 1 : 0;
 }
 
 int sakurajin::RS232::Write(unsigned char * buf, int size)

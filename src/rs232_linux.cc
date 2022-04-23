@@ -62,14 +62,6 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devn
     available = true;
 }
 
-int sakurajin::RS232::Read(unsigned char byte){
-    if (!available){
-        return -1;
-    }
-
-    return read(port, &byte, 1);
-}
-
 int sakurajin::RS232::Read(unsigned char *buf, int size){
     if (!available){
         return -1;
@@ -82,14 +74,6 @@ int sakurajin::RS232::Read(unsigned char *buf, int size){
     #endif
 
     return read(port, buf, size);
-}
-
-int sakurajin::RS232::Write(unsigned char byte){
-    if (!available){
-        return -1;
-    }
-
-    return write(port, &byte, 1);
 }
 
 int sakurajin::RS232::Write(unsigned char *buf, int size){

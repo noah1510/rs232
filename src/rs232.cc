@@ -19,7 +19,7 @@ void sakurajin::RS232::Print(const std::string& text){
     }
 
     for(unsigned char c : text){
-        Write(c);
+        Write(&c,1);
     }
 }
 
