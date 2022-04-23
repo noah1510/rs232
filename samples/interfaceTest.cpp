@@ -3,8 +3,19 @@
 
 using namespace sakurajin;
 
-int main () {
-    const std::string serialPort = "/dev/ttyUSB0";
+int main (int argc, char **argv) {
+
+    std::string serialPort = "";
+
+    if(argc == 2){
+        serialPort = argv[1];
+    }else{
+        #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+            serialPort = "/dev/ttyUSB0";
+        #else
+            serialPort = "\\\\.\\COM3";
+        #endif
+    }
     
     RS232 h{serialPort,baud19200};
 
