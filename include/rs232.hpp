@@ -15,6 +15,10 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <iostream>
 
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 
@@ -87,6 +91,10 @@ namespace sakurajin {
         #else
             HANDLE Cport;
         #endif
+
+        
+        int Read(unsigned char *, int);
+        int Write(unsigned char *, int);
         
     public:
         /**
@@ -116,12 +124,28 @@ namespace sakurajin {
          * @brief Get the name of the port used for this RS232 connection
          */
         std::string_view GetDeviceName() const;
-
-        int Read(unsigned char *, int);
-        int Write(unsigned char *, int);
         
+        /**
+         * @brief reads until the next character is received
+         * 
+         * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
         std::tuple<unsigned char, int> ReadNextChar();
+
+        /**
+         * @brief reads the interface until a newline (\n) is received
+         * 
+         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
         std::tuple<std::string, int> ReadNextMessage();
+
+        /**
+         * @brief read the interface until one of the stop conditions is reached
+         * 
+         * @param conditions a vector containing all the stop conditions.
+         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
+        std::tuple<std::string, int> ReadUntil(std::vector<unsigned char> conditions);
 
         void Print(const std::string& text);
 
