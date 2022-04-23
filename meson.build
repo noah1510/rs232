@@ -21,18 +21,12 @@ unix_c_headers = [
     'sys/ioctl.h',
     'unistd.h',
     'fcntl.h',
-    'sys/types.h',
-    'sys/stat.h',
     'limits.h',
-    'stdio.h',
-    'string.h',
 ]
 
 # All the headers required to compile the lib on windows
 windows_c_headers = [
     'windows.h',
-    'stdio.h',
-    'string.h',
 ]
 
 # All the required c++ headers, there are needed across all operating systems
@@ -98,10 +92,11 @@ if get_option('build_sample')
     sample_src = [
         'interfaceTest'
     ]
+    
     if host_machine.system() == 'windows'
-        message('No sample for windows exists yet! Feel free to open a merge request to add one.')
+        message('No sample specific for windows exists yet! Feel free to open a merge request to add one.')
     else
-        sample_src += 'sample_linux'
+        message('No sample specific for unix exists yet! Feel free to open a merge request to add one.')
     endif
 
     foreach sample_program : sample_src

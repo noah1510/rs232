@@ -12,15 +12,9 @@
 
 #include "rs232.hpp"
 
-#include "stdio.h"
-#include "string.h"
-
-
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <limits.h>
 
 sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devname(deviceName), available(false){
@@ -30,7 +24,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devn
     
     port = open(devname.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if(port == -1){
-        perror("unable to open comport ");
+        std::cerr << "unable to open comport "<< std::endl  ;
         return;
     }
 
@@ -41,9 +35,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devn
         return;
     }
     
-    struct termios nps;
-
-    memset(&nps, 0, sizeof(nps));  /* clear the new struct */
+    struct termios nps{};
 
     nps.c_cflag = baudr | CS8 | CLOCAL | CREAD;
     nps.c_iflag = IGNPAR;
@@ -67,11 +59,14 @@ int sakurajin::RS232::Read(unsigned char *buf, int size){
         return -1;
     }
 
+    int limit = 
     #ifndef __STRICT_ANSI__                       /* __STRICT_ANSI__ is defined when the -ansi option is used for gcc */
-        if(size > SSIZE_MAX)  size = (int)SSIZE_MAX;  /* SSIZE_MAX is defined in limits.h */
+        (int)SSIZE_MAX;  /* SSIZE_MAX is defined in limits.h */
     #else
-        if(size>4096)  size = 4096;
+        4096;
     #endif
+        
+    size = std::clamp(size, 0, limit);
 
     return read(port, buf, size);
 }
