@@ -39,6 +39,11 @@ windows_c_headers = [
 cpp_headers = [
     'string',
     'string_view',
+    'tuple',
+    'vector',
+    'sstream',
+    'algorithm',
+    'iostream',
 ]
 
 # The array containing all the sources that will be compiled

@@ -12,13 +12,10 @@
 
 #include "rs232.hpp"
 
-#include "stdio.h"
-#include "string.h"
-
 sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devname(deviceName){
 
-    char baudr_conf[64];
-    sprintf(baudr_conf, "baud=%d data=8 parity=N stop=1",baudrate);
+    std::ostringstream baudr_conf;
+    baudr_conf << "baud=" << baudrate << " data=8 parity=N stop=1";
 
     Cport = CreateFileA(
         devname.c_str(),
@@ -31,7 +28,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
     );                     
 
     if(Cport == INVALID_HANDLE_VALUE){
-        printf("unable to open comport\n");
+        std::cerr << "unable to open comport" << std::endl;
         return;
     }
 
@@ -39,14 +36,14 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
     memset(&port_settings, 0, sizeof(port_settings));  /* clear the new struct  */
     port_settings.DCBlength = sizeof(port_settings);
 
-    if(!BuildCommDCBA(baudr_conf, &port_settings)){
-        printf("unable to set comport dcb settings\n");
+    if(!BuildCommDCBA(baudr_conf.str().c_str(), &port_settings)){
+        std::cerr << "unable to set comport dcb settings" << std::endl;
         CloseHandle(Cport);
         return;
     }
 
     if(!SetCommState(Cport, &port_settings)){
-        printf("unable to set comport cfg settings\n");
+        std::cerr << "unable to set comport cfg settings" << std::endl;
         CloseHandle(Cport);
         return;
     }
@@ -60,7 +57,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
     Cptimeouts.WriteTotalTimeoutConstant   = 0;
 
     if(!SetCommTimeouts(Cport, &Cptimeouts)){
-        printf("unable to set comport time-out settings\n");
+        std::cerr << "unable to set comport time-out settings" << std::endl;
         CloseHandle(Cport);
         return;
     }
@@ -71,9 +68,13 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
 }
 
 int sakurajin::RS232::Read(unsigned char *buf, int size){
+    if (!available){
+        return -1;
+    }
+
     int n;
 
-    if(size>4096)  size = 4096;
+    size = std::clamp(size, 0, 4096);
 
   /* added the void pointer cast, otherwise gcc will complain about */
   /* "warning: dereferencing type-punned pointer will break strict aliasing rules" */
@@ -84,16 +85,21 @@ int sakurajin::RS232::Read(unsigned char *buf, int size){
 }
 
 int sakurajin::RS232::Write(unsigned char * buf, int size){
+    if (!available){
+        return -1;
+    }
+
     int n;
 
     if(WriteFile(Cport, buf, size, (LPDWORD)((void *)&n), NULL)){
-      return(n);
+      return n;
     }
 
-    return(-1);
+    return -1;
 }
 
 void sakurajin::RS232::Close(){
+    available = false;
     CloseHandle(Cport);
 }
 

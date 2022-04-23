@@ -37,7 +37,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devn
     int error = tcgetattr(port, &ops);
     if(error == -1){
         close(port);
-        perror("unable to read portsettings ");
+        std::cerr << "unable to read portsettings " << std::endl;
         return;
     }
     
@@ -55,7 +55,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devn
     error = tcsetattr(port, TCSANOW, &nps);
     if(error == -1){
         close(port);
-        perror("unable to adjust portsettings ");
+        std::cerr << "unable to adjust portsettings " << std::endl;
         return;
     }
 
