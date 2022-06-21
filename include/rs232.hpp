@@ -10,7 +10,10 @@
 ***********************************************
 */
 
-#pragma once
+
+
+#ifndef SAKURAJIN_RS232_HPP_INCLUDED
+#define SAKURAJIN_RS232_HPP_INCLUDED
 
 #include <string>
 #include <string_view>
@@ -19,6 +22,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iostream>
+#include <chrono>
 
 #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 
@@ -129,8 +133,20 @@ namespace sakurajin {
          * @brief reads until the next character is received
          * 
          * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
+         * The return value is >= 0 if everything is okay and < 0 if something went wrong
          */
         std::tuple<unsigned char, int> ReadNextChar();
+        
+        /**
+         * @brief reads until the next character is received or the waitTaime is over
+         * 
+         * @param waitTime the duration that should be waited for a signal before stopping the function.
+         * 
+         * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
+         * The return value is >= 0 if everything is okay and < 0 if something went wrong
+         */
+        template<class Rep = int64_t, class Period = std::ratio<1> >
+        std::tuple<unsigned char, int> ReadNextChar(std::chrono::duration<Rep, Period> waitTime);
 
         /**
          * @brief reads the interface until a newline (\n) is received
@@ -159,3 +175,7 @@ namespace sakurajin {
     };
 
 }
+
+#include "rs232_template_implementations.hpp"
+
+#endif // RS232_HPP_INCLUDED
