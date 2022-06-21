@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef SAKURAJIN_RS232_HPP_INCLUDED
 
     template<class Rep, class Period>
