@@ -48,33 +48,6 @@ std::tuple<std::string, int> sakurajin::RS232::ReadNextMessage(){
 }
 
 std::tuple<std::string, int> sakurajin::RS232::ReadUntil(const std::vector<unsigned char>& conditions){
-    if(!available){
-        return {"", -1};
-    }
-    
-    std::string message = "";
-    int errCode = 0;
-    unsigned char nextChar = '\n';
-    bool stop = false;
-        
-    while(!stop){
-        //read the next char and append if there was no error
-        std::tie(nextChar, errCode) = ReadNextChar();
-        
-        if(errCode < 0){
-            return {"", -1};
-        }
-        message += nextChar;
-
-        //check if a stop condition is met
-        for(auto cond:conditions){
-            if (cond == nextChar){
-                stop = true;
-                break;
-            }
-        }
-    }
-    
-    return {message,0};
+    return ReadUntil(conditions, std::chrono::microseconds(1), true);
 }
 

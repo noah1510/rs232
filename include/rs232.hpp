@@ -141,6 +141,7 @@ namespace sakurajin {
          * @brief reads until the next character is received or the waitTaime is over
          * 
          * @param waitTime the duration that should be waited for a signal before stopping the function.
+         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
          * 
          * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
          * The return value is >= 0 if everything is okay and < 0 if something went wrong
@@ -162,6 +163,24 @@ namespace sakurajin {
          * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
          */
         std::tuple<std::string, int> ReadUntil(const std::vector<unsigned char>& conditions);
+
+        /**
+         * @brief read the interface until one of the stop conditions is reached or the waitTaime is over
+         * The waitTime is the time the code will wait for each next character. If the delay between the 
+         * characters is too long the function will return an error.
+         * 
+         * @param waitTime the duration that should be waited for a signal before stopping the function.
+         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
+         * 
+         * @param conditions a vector containing all the stop conditions.
+         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
+        template<class Rep = int64_t, class Period = std::ratio<1> >
+        std::tuple<std::string, int> ReadUntil(
+            const std::vector<unsigned char>& conditions, 
+            std::chrono::duration<Rep, Period> waitTime, 
+            bool ignoreTime = false
+        );
 
         void Print(const std::string& text);
 

@@ -33,6 +33,42 @@
         
         return {IOBuf, 0};
     }
+    
+    template<class Rep, class Period>
+    std::tuple<std::string, int> sakurajin::RS232::ReadUntil(
+        const std::vector<unsigned char>& conditions, 
+        std::chrono::duration<Rep, Period> waitTime, 
+        bool ignoreTime
+    ){
+        if(!available){
+            return {"", -1};
+        }
+        
+        std::string message = "";
+        int errCode = 0;
+        unsigned char nextChar = '\n';
+        bool stop = false;
+        
+        while(!stop){
+            //read the next char and append if there was no error
+            std::tie(nextChar, errCode) = ReadNextChar(waitTime, ignoreTime);
+            
+            if(errCode < 0){
+                return {"", -1};
+            }
+            message += nextChar;
+
+            //check if a stop condition is met
+            for(auto cond:conditions){
+                if (cond == nextChar){
+                    stop = true;
+                    break;
+                }
+            }
+        }
+        
+        return {message,0};
+    }
 
 #else
 
