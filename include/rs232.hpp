@@ -161,7 +161,7 @@ namespace sakurajin {
          * @param conditions a vector containing all the stop conditions.
          * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
          */
-        std::tuple<std::string, int> ReadUntil(std::vector<unsigned char> conditions);
+        std::tuple<std::string, int> ReadUntil(const std::vector<unsigned char>& conditions);
 
         void Print(const std::string& text);
 
