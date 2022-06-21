@@ -101,12 +101,13 @@ if get_option('build_sample')
 
     foreach sample_program : sample_src
 
-    exe = executable(
-        sample_program, 
-        'samples/' + sample_program + '.cpp',
-        dependencies: rs232_dep
-    )
-endforeach
+        exe = executable(
+            sample_program, 
+            'samples/' + sample_program + '.cpp',
+            dependencies: rs232_dep
+        )
+        
+    endforeach
 
 endif
 
