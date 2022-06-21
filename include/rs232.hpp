@@ -146,7 +146,7 @@ namespace sakurajin {
          * The return value is >= 0 if everything is okay and < 0 if something went wrong
          */
         template<class Rep = int64_t, class Period = std::ratio<1> >
-        std::tuple<unsigned char, int> ReadNextChar(std::chrono::duration<Rep, Period> waitTime);
+        std::tuple<unsigned char, int> ReadNextChar(std::chrono::duration<Rep, Period> waitTime, bool ignoreTime = false);
 
         /**
          * @brief reads the interface until a newline (\n) is received

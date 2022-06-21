@@ -36,18 +36,7 @@ sakurajin::RS232::~RS232(){
 }
 
 std::tuple<unsigned char, int> sakurajin::RS232::ReadNextChar() {
-    if(!available){
-        return {'\0', -1};
-    }
-    
-    unsigned char IOBuf = '\0';
-    int errCode = 0;
-    
-    do{
-        errCode = Read(&IOBuf,1);
-    }while(errCode != 1);
-    
-    return {IOBuf, 0};
+    return ReadNextChar(std::chrono::microseconds(1), true);
 }
 
 std::tuple<std::string, int> sakurajin::RS232::ReadNextMessage(){
