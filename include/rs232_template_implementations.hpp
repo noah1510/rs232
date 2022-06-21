@@ -34,6 +34,15 @@
         return {IOBuf, 0};
     }
     
+    
+    template<class Rep, class Period>
+    std::tuple<std::string, int> sakurajin::RS232::ReadNextMessage(
+        std::chrono::duration<Rep, Period> waitTime, 
+        bool ignoreTime
+    ){
+        return ReadUntil({'\n'}, waitTime, ignoreTime);
+    }
+    
     template<class Rep, class Period>
     std::tuple<std::string, int> sakurajin::RS232::ReadUntil(
         const std::vector<unsigned char>& conditions, 

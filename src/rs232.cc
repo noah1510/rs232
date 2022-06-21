@@ -40,11 +40,7 @@ std::tuple<unsigned char, int> sakurajin::RS232::ReadNextChar() {
 }
 
 std::tuple<std::string, int> sakurajin::RS232::ReadNextMessage(){
-    if(!available){
-        return {"", -1};
-    }
-    
-    return ReadUntil({'\n'});
+    return ReadNextMessage(std::chrono::microseconds(1), true);
 }
 
 std::tuple<std::string, int> sakurajin::RS232::ReadUntil(const std::vector<unsigned char>& conditions){
