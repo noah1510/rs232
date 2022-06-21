@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sakurajin_41',['sakurajin',['../namespacesakurajin.html',1,'']]]
+  ['sakurajin_42',['sakurajin',['../namespacesakurajin.html',1,'']]]
 ];

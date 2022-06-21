@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">rs232
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.1.0</span>
    </div>
   </td>
  </tr>
@@ -87,20 +87,34 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a360b6806fe8bb786eac9352bdda60d15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#a360b6806fe8bb786eac9352bdda60d15">IsAvailable</a> () const</td></tr>
 <tr class="memdesc:a360b6806fe8bb786eac9352bdda60d15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the connection was started sucessfully.  <a href="classsakurajin_1_1_r_s232.html#a360b6806fe8bb786eac9352bdda60d15">More...</a><br /></td></tr>
 <tr class="separator:a360b6806fe8bb786eac9352bdda60d15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7c14ad346480f980d7b883c282f38df"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#ac7c14ad346480f980d7b883c282f38df">IsCTSEnabled</a> ()</td></tr>
-<tr class="separator:ac7c14ad346480f980d7b883c282f38df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b8a857affb605d87d03d46d5b61588f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#a7b8a857affb605d87d03d46d5b61588f">IsCTSEnabled</a> ()</td></tr>
+<tr class="memdesc:a7b8a857affb605d87d03d46d5b61588f"><td class="mdescLeft">&#160;</td><td class="mdescRight">check if the clear to send flag is set  <a href="classsakurajin_1_1_r_s232.html#a7b8a857affb605d87d03d46d5b61588f">More...</a><br /></td></tr>
+<tr class="separator:a7b8a857affb605d87d03d46d5b61588f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ab7e167d260e5d46ceddf7ce2552533"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#a9ab7e167d260e5d46ceddf7ce2552533">Print</a> (const std::string &amp;text)</td></tr>
 <tr class="separator:a9ab7e167d260e5d46ceddf7ce2552533"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeaec46e9fab555d4b7455af0a340ca51"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; unsigned char, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#aeaec46e9fab555d4b7455af0a340ca51">ReadNextChar</a> ()</td></tr>
 <tr class="memdesc:aeaec46e9fab555d4b7455af0a340ca51"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads until the next character is received  <a href="classsakurajin_1_1_r_s232.html#aeaec46e9fab555d4b7455af0a340ca51">More...</a><br /></td></tr>
 <tr class="separator:aeaec46e9fab555d4b7455af0a340ca51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2e55d746d627b5ee68a5e3610aa1d96"><td class="memTemplParams" colspan="2">template&lt;class Rep  = int64_t, class Period  = std::ratio&lt;1&gt;&gt; </td></tr>
+<tr class="memitem:ae2e55d746d627b5ee68a5e3610aa1d96"><td class="memTemplItemLeft" align="right" valign="top">std::tuple&lt; unsigned char, int &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#ae2e55d746d627b5ee68a5e3610aa1d96">ReadNextChar</a> (std::chrono::duration&lt; Rep, Period &gt; waitTime, bool ignoreTime=false)</td></tr>
+<tr class="memdesc:ae2e55d746d627b5ee68a5e3610aa1d96"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads until the next character is received or the waitTaime is over  <a href="classsakurajin_1_1_r_s232.html#ae2e55d746d627b5ee68a5e3610aa1d96">More...</a><br /></td></tr>
+<tr class="separator:ae2e55d746d627b5ee68a5e3610aa1d96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6ea76832499eaa4399facd3bcc9b019"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; std::string, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#af6ea76832499eaa4399facd3bcc9b019">ReadNextMessage</a> ()</td></tr>
 <tr class="memdesc:af6ea76832499eaa4399facd3bcc9b019"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads the interface until a newline (<br  />
 ) is received  <a href="classsakurajin_1_1_r_s232.html#af6ea76832499eaa4399facd3bcc9b019">More...</a><br /></td></tr>
 <tr class="separator:af6ea76832499eaa4399facd3bcc9b019"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9820392823b2a5cc4fdbaa10406bd445"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; std::string, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#a9820392823b2a5cc4fdbaa10406bd445">ReadUntil</a> (std::vector&lt; unsigned char &gt; conditions)</td></tr>
-<tr class="memdesc:a9820392823b2a5cc4fdbaa10406bd445"><td class="mdescLeft">&#160;</td><td class="mdescRight">read the interface until one of the stop conditions is reached  <a href="classsakurajin_1_1_r_s232.html#a9820392823b2a5cc4fdbaa10406bd445">More...</a><br /></td></tr>
-<tr class="separator:a9820392823b2a5cc4fdbaa10406bd445"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66b4b5c624a953d31a1ea49762886514"><td class="memTemplParams" colspan="2">template&lt;class Rep  = int64_t, class Period  = std::ratio&lt;1&gt;&gt; </td></tr>
+<tr class="memitem:a66b4b5c624a953d31a1ea49762886514"><td class="memTemplItemLeft" align="right" valign="top">std::tuple&lt; std::string, int &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#a66b4b5c624a953d31a1ea49762886514">ReadNextMessage</a> (std::chrono::duration&lt; Rep, Period &gt; waitTime, bool ignoreTime=false)</td></tr>
+<tr class="memdesc:a66b4b5c624a953d31a1ea49762886514"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads the interface until a newline (<br  />
+) is received or the waitTime is over The waitTime is the time the code will wait for each next character.  <a href="classsakurajin_1_1_r_s232.html#a66b4b5c624a953d31a1ea49762886514">More...</a><br /></td></tr>
+<tr class="separator:a66b4b5c624a953d31a1ea49762886514"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1f6bac5649152408c510a8039ef8e11"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; std::string, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#ad1f6bac5649152408c510a8039ef8e11">ReadUntil</a> (const std::vector&lt; unsigned char &gt; &amp;conditions)</td></tr>
+<tr class="memdesc:ad1f6bac5649152408c510a8039ef8e11"><td class="mdescLeft">&#160;</td><td class="mdescRight">read the interface until one of the stop conditions is reached  <a href="classsakurajin_1_1_r_s232.html#ad1f6bac5649152408c510a8039ef8e11">More...</a><br /></td></tr>
+<tr class="separator:ad1f6bac5649152408c510a8039ef8e11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81a01b35154d8cfe88345c115c1bcf88"><td class="memTemplParams" colspan="2">template&lt;class Rep  = int64_t, class Period  = std::ratio&lt;1&gt;&gt; </td></tr>
+<tr class="memitem:a81a01b35154d8cfe88345c115c1bcf88"><td class="memTemplItemLeft" align="right" valign="top">std::tuple&lt; std::string, int &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#a81a01b35154d8cfe88345c115c1bcf88">ReadUntil</a> (const std::vector&lt; unsigned char &gt; &amp;conditions, std::chrono::duration&lt; Rep, Period &gt; waitTime, bool ignoreTime=false)</td></tr>
+<tr class="memdesc:a81a01b35154d8cfe88345c115c1bcf88"><td class="mdescLeft">&#160;</td><td class="mdescRight">read the interface until one of the stop conditions is reached or the waitTaime is over The waitTime is the time the code will wait for each next character.  <a href="classsakurajin_1_1_r_s232.html#a81a01b35154d8cfe88345c115c1bcf88">More...</a><br /></td></tr>
+<tr class="separator:a81a01b35154d8cfe88345c115c1bcf88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6214d2455c1bac7feff823aac17ca8b4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsakurajin_1_1_r_s232.html#a6214d2455c1bac7feff823aac17ca8b4">RS232</a> (const std::string &amp;deviceName, <a class="el" href="namespacesakurajin.html#a0b7f87db0d684b644ba50ee6f43a128f">Baudrate</a> Rate)</td></tr>
 <tr class="memdesc:a6214d2455c1bac7feff823aac17ca8b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classsakurajin_1_1_r_s232.html">RS232</a> object.  <a href="classsakurajin_1_1_r_s232.html#a6214d2455c1bac7feff823aac17ca8b4">More...</a><br /></td></tr>
 <tr class="separator:a6214d2455c1bac7feff823aac17ca8b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -228,20 +242,25 @@ false there was an error while initializing the connection or some of the settin
 
 </div>
 </div>
-<a id="ac7c14ad346480f980d7b883c282f38df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7c14ad346480f980d7b883c282f38df">&#9670;&nbsp;</a></span>IsCTSEnabled()</h2>
+<a id="a7b8a857affb605d87d03d46d5b61588f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b8a857affb605d87d03d46d5b61588f">&#9670;&nbsp;</a></span>IsCTSEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int sakurajin::RS232::IsCTSEnabled </td>
+          <td class="memname">bool sakurajin::RS232::IsCTSEnabled </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>check if the clear to send flag is set </p>
+<dl class="section return"><dt>Returns</dt><dd>true if the flag is set </dd>
+<dd>
+false if the flag is not set </dd></dl>
 
 </div>
 </div>
@@ -264,7 +283,7 @@ false there was an error while initializing the connection or some of the settin
 </div>
 </div>
 <a id="aeaec46e9fab555d4b7455af0a340ca51"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeaec46e9fab555d4b7455af0a340ca51">&#9670;&nbsp;</a></span>ReadNextChar()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaec46e9fab555d4b7455af0a340ca51">&#9670;&nbsp;</a></span>ReadNextChar() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -279,12 +298,52 @@ false there was an error while initializing the connection or some of the settin
 </div><div class="memdoc">
 
 <p>reads until the next character is received </p>
-<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;unsigned char, int&gt; this tuple contains the wanted return data and an error code in case something went wrong </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;unsigned char, int&gt; this tuple contains the wanted return data and an error code in case something went wrong The return value is &gt;= 0 if everything is okay and &lt; 0 if something went wrong </dd></dl>
+
+</div>
+</div>
+<a id="ae2e55d746d627b5ee68a5e3610aa1d96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2e55d746d627b5ee68a5e3610aa1d96">&#9670;&nbsp;</a></span>ReadNextChar() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Rep , class Period &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::tuple&lt; unsigned char, int &gt; sakurajin::RS232::ReadNextChar </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;&#160;</td>
+          <td class="paramname"><em>waitTime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>ignoreTime</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>reads until the next character is received or the waitTaime is over </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">waitTime</td><td>the duration that should be waited for a signal before stopping the function. </td></tr>
+    <tr><td class="paramname">ignoreTime</td><td>true if the duration value should be ignored (the same as no parameter)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;unsigned char, int&gt; this tuple contains the wanted return data and an error code in case something went wrong The return value is &gt;= 0 if everything is okay and &lt; 0 if something went wrong </dd></dl>
 
 </div>
 </div>
 <a id="af6ea76832499eaa4399facd3bcc9b019"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af6ea76832499eaa4399facd3bcc9b019">&#9670;&nbsp;</a></span>ReadNextMessage()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af6ea76832499eaa4399facd3bcc9b019">&#9670;&nbsp;</a></span>ReadNextMessage() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -304,8 +363,50 @@ false there was an error while initializing the connection or some of the settin
 
 </div>
 </div>
-<a id="a9820392823b2a5cc4fdbaa10406bd445"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9820392823b2a5cc4fdbaa10406bd445">&#9670;&nbsp;</a></span>ReadUntil()</h2>
+<a id="a66b4b5c624a953d31a1ea49762886514"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66b4b5c624a953d31a1ea49762886514">&#9670;&nbsp;</a></span>ReadNextMessage() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Rep , class Period &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::tuple&lt; std::string, int &gt; sakurajin::RS232::ReadNextMessage </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;&#160;</td>
+          <td class="paramname"><em>waitTime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>ignoreTime</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>reads the interface until a newline (<br  />
+) is received or the waitTime is over The waitTime is the time the code will wait for each next character. </p>
+<p>If the delay between the characters is too long the function will return an error.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">waitTime</td><td>the duration that should be waited for a signal before stopping the function. </td></tr>
+    <tr><td class="paramname">ignoreTime</td><td>true if the duration value should be ignored (the same as no parameter)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;std::string, int&gt; this tuple contains the wanted return data and an error code in case something went wrong </dd></dl>
+
+</div>
+</div>
+<a id="ad1f6bac5649152408c510a8039ef8e11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1f6bac5649152408c510a8039ef8e11">&#9670;&nbsp;</a></span>ReadUntil() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -313,7 +414,7 @@ false there was an error while initializing the connection or some of the settin
         <tr>
           <td class="memname">std::tuple&lt; std::string, int &gt; sakurajin::RS232::ReadUntil </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; unsigned char &gt;&#160;</td>
+          <td class="paramtype">const std::vector&lt; unsigned char &gt; &amp;&#160;</td>
           <td class="paramname"><em>conditions</em></td><td>)</td>
           <td></td>
         </tr>
@@ -331,11 +432,60 @@ false there was an error while initializing the connection or some of the settin
 
 </div>
 </div>
+<a id="a81a01b35154d8cfe88345c115c1bcf88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81a01b35154d8cfe88345c115c1bcf88">&#9670;&nbsp;</a></span>ReadUntil() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Rep , class Period &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::tuple&lt; std::string, int &gt; sakurajin::RS232::ReadUntil </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; unsigned char &gt; &amp;&#160;</td>
+          <td class="paramname"><em>conditions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::chrono::duration&lt; Rep, Period &gt;&#160;</td>
+          <td class="paramname"><em>waitTime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>ignoreTime</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>read the interface until one of the stop conditions is reached or the waitTaime is over The waitTime is the time the code will wait for each next character. </p>
+<p>If the delay between the characters is too long the function will return an error.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">waitTime</td><td>the duration that should be waited for a signal before stopping the function. </td></tr>
+    <tr><td class="paramname">ignoreTime</td><td>true if the duration value should be ignored (the same as no parameter)</td></tr>
+    <tr><td class="paramname">conditions</td><td>a vector containing all the stop conditions. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;std::string, int&gt; this tuple contains the wanted return data and an error code in case something went wrong </dd></dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>include/<a class="el" href="rs232_8hpp_source.html">rs232.hpp</a></li>
 <li>src/<a class="el" href="rs232_8cc.html">rs232.cc</a></li>
 <li>src/<a class="el" href="rs232__linux_8cc.html">rs232_linux.cc</a></li>
 <li>src/<a class="el" href="rs232__win_8cc.html">rs232_win.cc</a></li>
+<li>include/<a class="el" href="rs232__template__implementations_8hpp_source.html">rs232_template_implementations.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
