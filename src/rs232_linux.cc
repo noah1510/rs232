@@ -100,8 +100,8 @@ TIOCM_RNG   RNG (ring)
 TIOCM_RI    Synonym for TIOCM_RNG
 TIOCM_DSR   DSR (data set ready)
 */
-int sakurajin::RS232::IsCTSEnabled(){
+bool sakurajin::RS232::IsCTSEnabled(){
     int status;
     status = ioctl(port, TIOCMGET, &status);
-    return (status & TIOCM_CTS)? 1 : 0;
+    return status & TIOCM_CTS;
 }

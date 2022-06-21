@@ -103,8 +103,8 @@ void sakurajin::RS232::Close(){
     CloseHandle(Cport);
 }
 
-int sakurajin::RS232::IsCTSEnabled(){
+bool sakurajin::RS232::IsCTSEnabled(){
     int status;
     GetCommModemStatus(Cport, (LPDWORD)((void *)&status));
-    return (status & MS_CTS_ON)? 1 : 0;
+    return status & MS_CTS_ON;
 }

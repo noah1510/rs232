@@ -206,7 +206,14 @@ namespace sakurajin {
          * 
          */
         void Close();
-        int IsCTSEnabled();
+        
+        /**
+         * @brief check if the clear to send flag is set
+         * 
+         * @return true if the flag is set
+         * @return false if the flag is not set
+         */
+        bool IsCTSEnabled();
     };
 
 }
