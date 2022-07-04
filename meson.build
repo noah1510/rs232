@@ -59,6 +59,8 @@ if host_machine.system() == 'windows'
     foreach header_name : windows_c_headers
         cc.check_header(header_name, required: true)
     endforeach
+    add_global_arguments('-fno-use-linker-plugin', language : 'cpp')
+
 else
     # add the unix source and check if the headers work
     sources += 'src/rs232_linux.cc'
