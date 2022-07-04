@@ -54,12 +54,7 @@ namespace sakurajin {
             baud38400 = B38400,
             baud57600 = B57600,
             baud115200 = B115200,
-            baud230400 = B230400,
-            baud460800 = B460800,
-            baud500000 = B500000,
-            baud576000 = B576000,
-            baud921600 = B921600,
-            baud1000000 = B1000000
+            baud230400 = B230400
         };
     #else
         enum Baudrate{
