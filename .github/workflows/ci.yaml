@@ -37,7 +37,7 @@ jobs:
           action: build
           directory: build
           options: --verbose
-          meson-version: 0.61.3
+          meson-version: 0.63.0
           setup-options: -Db_lto=false -Db_pgo=off
       - name: clearing build directory
         run: Remove-Item -recurse -force build
