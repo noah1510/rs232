@@ -34,7 +34,7 @@
 
 namespace sakurajin {
 
-    #if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+    #if defined(__unix__) || defined(__unix) || defined(__linux__) || defined(__APPLE__) 
         enum Baudrate{
             baud50 = B50,
             baud75 = B75,
