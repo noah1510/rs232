@@ -51,6 +51,9 @@ foreach header_name : cpp_headers
     cxx.check_header(header_name, required: true)
 endforeach
 
+#extra linker args
+extra_linker_args = ''
+
 # check if the code is compiled on windows or any other system
 if host_machine.system() == 'windows'
     # add the windows source and check if the heads exist and work
@@ -59,7 +62,7 @@ if host_machine.system() == 'windows'
     foreach header_name : windows_c_headers
         cc.check_header(header_name, required: true)
     endforeach
-    add_global_arguments('-fno-use-linker-plugin', language : 'cpp')
+    extra_linker_args += ' -fno-use-linker-plugin '
 
 else
     # add the unix source and check if the headers work
@@ -80,6 +83,7 @@ rs232 = library(
     version : meson.project_version(), 
     soversion : '0',
     include_directories : incdir,
+    link_args: extra_linker_args,
     install : true,
 )
 
@@ -106,6 +110,7 @@ if get_option('build_sample')
         exe = executable(
             sample_program, 
             'samples/' + sample_program + '.cpp',
+            link_args: extra_linker_args,
             dependencies: rs232_dep
         )
         
