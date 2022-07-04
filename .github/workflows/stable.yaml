@@ -15,7 +15,7 @@ jobs:
       - uses: BSFishy/meson-build@v1.0.2
         name: build full
         with:
-          action: test
+          action: compile
           directory: build
           options: --verbose
           meson-version: 0.61.3
@@ -31,7 +31,7 @@ jobs:
       - uses: BSFishy/meson-build@v1.0.2
         name: build full
         with:
-          action: test
+          action: compile
           directory: build
           options: --verbose
           meson-version: 0.61.3
@@ -48,7 +48,7 @@ jobs:
       - uses: BSFishy/meson-build@v1.0.2
         name: build full
         with:
-          action: test
+          action: compile
           directory: build
           options: --verbose
           meson-version: 0.61.3
