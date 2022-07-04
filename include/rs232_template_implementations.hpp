@@ -81,6 +81,6 @@
 
 #else
 
-    #error "do not direktly include this header!"
+    #error "do not directly include this header!"
 
 #endif

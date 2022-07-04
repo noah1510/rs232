@@ -38,7 +38,7 @@ jobs:
           directory: build
           options: --verbose
           meson-version: 0.61.3
-          setup-options: -Ddefault_library=static -Db_lto=false
+          setup-options: -Ddefault_library=static -Db_lto=false -Db_pgo=off
       - name: clearing build directory
         run: Remove-Item -recurse -force build
         

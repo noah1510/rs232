@@ -24,7 +24,8 @@
 #include <iostream>
 #include <chrono>
 
-#if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+#if defined(__unix__) || defined(__unix) || defined(__linux__) || defined(__APPLE__)
+    #define RS232_UNIX
 
     #include <termios.h>
 
@@ -34,7 +35,7 @@
 
 namespace sakurajin {
 
-    #if defined(__unix__) || defined(__unix) || defined(__linux__) || defined(__APPLE__) 
+    #ifdef RS232_UNIX
         enum Baudrate{
             baud50 = B50,
             baud75 = B75,
@@ -90,7 +91,7 @@ namespace sakurajin {
         int r, port;    // Baudrate and Port Number
         bool available;
 
-        #if defined(unix) || defined(__unix__) || defined(__unix)
+        #ifdef RS232_UNIX
             struct termios ops; // old port settings
         #else
             HANDLE Cport;
