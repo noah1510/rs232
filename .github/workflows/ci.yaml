@@ -25,7 +25,24 @@ jobs:
 #      - name: clearing build directory
 #        run: rm -rf build
 
-  windows:
+  windows1:
+    name: "windows compile and test"
+    runs-on: "windows-latest"
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1          
+      - uses: BSFishy/meson-build@v1.0.2
+        name: build full
+        with:
+          action: build
+          directory: build
+          options: --verbose
+          meson-version: 0.61.3
+          setup-options: -Ddefault_library=static -Db_lto=true -Db_pgo=off
+      - name: clearing build directory
+        run: Remove-Item -recurse -force build
+
+  windows2:
     name: "windows compile and test"
     runs-on: "windows-latest"
     steps:
@@ -40,8 +57,41 @@ jobs:
           meson-version: 0.63.0
           setup-options: -Db_lto=false -Db_pgo=off
       - name: clearing build directory
+        run: Remove-Item -recurse -force build    
+
+  windows3:
+    name: "windows compile and test"
+    runs-on: "windows-latest"
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1          
+      - uses: BSFishy/meson-build@v1.0.2
+        name: build full
+        with:
+          action: build
+          directory: build
+          options: --verbose
+          meson-version: 0.61.3
+          setup-options: -Ddefault_library=shared -Db_lto=true -Db_pgo=off
+      - name: clearing build directory
         run: Remove-Item -recurse -force build
-        
+
+  windows4:
+    name: "windows compile and test"
+    runs-on: "windows-latest"
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1          
+      - uses: BSFishy/meson-build@v1.0.2
+        name: build full
+        with:
+          action: build
+          directory: build
+          options: --verbose
+          meson-version: 0.61.3
+          setup-options: -Ddefault_library=shared -Db_lto=false -Db_pgo=off
+      - name: clearing build directory
+        run: Remove-Item -recurse -force build    
 #  macos:
 #    name: "mac os compile and test"
 #    runs-on: "macos-latest"
