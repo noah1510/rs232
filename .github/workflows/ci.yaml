@@ -36,7 +36,8 @@ jobs:
           install: >-
             git
             base-devel
-            meson
+            mingw-w64-x86_64-python3
+            mingw-w64-x86_64-meson
       - name: compile rs232 lib 
         shell: msys2 {0}
         run: |
