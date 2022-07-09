@@ -27,15 +27,20 @@ jobs:
     runs-on: "windows-latest"
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1          
-      - uses: BSFishy/meson-build@v1.0.2
-        name: build full
+      - uses: msys2/setup-msys2@v2
         with:
-          action: build
-          directory: build
-          options: --verbose
-          meson-version: 0.61.3
-          setup-options: -Ddefault_library=static -Db_lto=false
+          update: true
+          install: >-
+            git
+            base-devel
+            mingw-w64-x86_64-python3
+            mingw-w64-x86_64-meson
+      - name: compile rs232 lib 
+        shell: msys2 {0}
+        run: |
+          meson setup  -Ddefault_library=static -Db_lto=true -Db_pgo=off build
+          meson compile -C build
+          meson test -C build
       - name: clearing build directory
         run: Remove-Item -recurse -force build
         
