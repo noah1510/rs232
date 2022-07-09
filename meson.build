@@ -62,7 +62,6 @@ if host_machine.system() == 'windows'
     foreach header_name : windows_c_headers
         cc.check_header(header_name, required: true)
     endforeach
-    extra_linker_args += ' -fno-use-linker-plugin '
 
 else
     # add the unix source and check if the headers work
