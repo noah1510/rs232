@@ -6,7 +6,7 @@ project(
         'cpp_std=c++17',
         'c_std=c17',
     ],
-    version : '1.2.0',
+    version : '1.3.0',
     meson_version : '>= 0.55'
 
 )
@@ -14,6 +14,15 @@ project(
 # find the c and c++ compiler to check for working headers.
 cc = meson.get_compiler('c')
 cxx = meson.get_compiler('cpp')
+
+# define the correct export macro on windows
+if target_machine.system() == 'windows'
+    if get_option('buildtype') != 'static'
+        add_project_arguments('-DRS232_EXPORT_MACRO=__declspec(dllexport)', language: 'cpp')
+    else
+        add_project_arguments('-DRS232_EXPORT_MACRO=__declspec(dllimport)', language: 'cpp')
+    endif
+endif
 
 # All the headers required to compile the lib on unix systems
 unix_c_headers = [

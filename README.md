@@ -1,7 +1,7 @@
 RS232
 =====
 
-A C C++ library for using rs232 protocole over Linux and Windows.
+A C++ library for using rs232 protocole over Linux and Windows.
 This project was originally a fork of [kranfix/rs232](https://github.com/kranfix/rs232).
 All of the C cupport was dropped and huge code changes were made to make this a proper C++ library.
 

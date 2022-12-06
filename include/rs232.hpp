@@ -33,6 +33,10 @@
     #include <windows.h>
 #endif
 
+#ifndef RS232_EXPORT_MACRO
+    #define RS232_EXPORT_MACRO
+#endif
+
 namespace sakurajin {
 
     #ifdef RS232_UNIX
@@ -74,7 +78,7 @@ namespace sakurajin {
         };
     #endif
 
-    class RS232{
+    class RS232_EXPORT_MACRO RS232{
     private:
         /**
          * @brief The name of the connected port.
