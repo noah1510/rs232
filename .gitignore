@@ -13,5 +13,7 @@ doc
 # ide folders and files
 *.pro*
 *.kdev4*
+.idea
+.wineenv
 .vscode
 .cache
