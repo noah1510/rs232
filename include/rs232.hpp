@@ -30,7 +30,7 @@
     #include <termios.h>
 
 #else
-    #include <windows.h>
+    #include <WinDef.h>
 #endif
 
 #ifndef RS232_EXPORT_MACRO

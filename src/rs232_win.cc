@@ -11,6 +11,7 @@
 */
 
 #include "rs232.hpp"
+#include <windows.h>
 
 sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devname(deviceName){
 

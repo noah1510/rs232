@@ -22,6 +22,22 @@ if target_machine.system() == 'windows'
     else
         add_project_arguments('-DRS232_EXPORT_MACRO=__declspec(dllimport)', language: 'cpp')
     endif
+    
+    if target_machine.cpu_family() == 'x86_64'
+        add_project_arguments('-D_AMD64_', language: 'cpp')
+    elif target_machine.cpu_family() == 'x86'
+        add_project_arguments('-D_X86_', language: 'cpp')
+    elif target_machine.cpu_family() == 'ia64'
+        add_project_arguments('-D_IA64_', language: 'cpp')
+    elif target_machine.cpu_family() == 'arm'
+        add_project_arguments('-D_ARM_', language: 'cpp')
+    elif target_machine.cpu_family() == 'aarch64'
+        add_project_arguments('-D_ARM64_', language: 'cpp')
+    else
+        if meson.is_cross_build()
+            error('Unsupported cross compile cpu family:' + target_machine.cpu_family())
+        endif
+    endif
 endif
 
 # All the headers required to compile the lib on unix systems
