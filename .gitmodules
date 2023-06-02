@@ -1,0 +1,3 @@
+[submodule "build_scripts/msvc-wine"]
+	path = build_scripts/msvc-wine
+	url = https://github.com/mstorsjo/msvc-wine/
