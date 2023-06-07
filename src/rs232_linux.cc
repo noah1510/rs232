@@ -28,7 +28,8 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devn
         return;
     }
 
-    int error = tcgetattr(port, &ops);
+    portHandle = static_cast<void*>(new termios{});
+    int error = tcgetattr(port, static_cast<struct termios*>(portHandle));
     if(error == -1){
         close(port);
         std::cerr << "unable to read portsettings " << std::endl;
@@ -82,7 +83,8 @@ int sakurajin::RS232::Write(unsigned char *buf, int size){
 void sakurajin::RS232::Close(){
     available = false;
     close(port);
-    tcsetattr(port, TCSANOW, &ops);
+    tcsetattr(port, TCSANOW, static_cast<struct termios*>(portHandle));
+    delete static_cast<struct termios*>(portHandle);
 }
 
 /*

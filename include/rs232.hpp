@@ -29,54 +29,15 @@
 
     #include <termios.h>
 
-#else
-    #include <WinDef.h>
 #endif
+
+#include "rs232_baudrate_impl.hpp"
 
 #ifndef RS232_EXPORT_MACRO
     #define RS232_EXPORT_MACRO
 #endif
 
 namespace sakurajin {
-
-    #ifdef RS232_UNIX
-        enum Baudrate{
-            baud50 = B50,
-            baud75 = B75,
-            baud110 = B110,
-            baud134 = B134,
-            baud150 = B150,
-            baud200 = B200,
-            baud300 = B300,
-            baud600 = B600,
-            baud1200 = B1200,
-            baud1800 = B1800,
-            baud2400 = B2400,
-            baud4800 = B4800,
-            baud9600 = B9600,
-            baud19200 = B19200,
-            baud38400 = B38400,
-            baud57600 = B57600,
-            baud115200 = B115200,
-            baud230400 = B230400
-        };
-    #else
-        enum Baudrate{
-            baud110 = 110,
-            baud300 = 300,
-            baud600 = 600,
-            baud1200 = 1200,
-            baud2400 = 2400,
-            baud4800 = 4800,
-            baud9600 = 9600,
-            baud19200 = 19200,
-            baud38400 = 38400,
-            baud57600 = 57600,
-            baud115200 = 115200,
-            baud128000 = 128000,
-            baud256000 = 256000
-        };
-    #endif
 
     class RS232_EXPORT_MACRO RS232{
     private:
@@ -90,12 +51,7 @@ namespace sakurajin {
         int r, port;    // Baudrate and Port Number
         bool available;
 
-        #ifdef RS232_UNIX
-            struct termios ops; // old port settings
-        #else
-            HANDLE Cport;
-        #endif
-
+        void* portHandle = nullptr;
         
         int Read(unsigned char *, int);
         int Write(unsigned char *, int);
