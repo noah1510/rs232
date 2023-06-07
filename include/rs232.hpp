@@ -26,9 +26,6 @@
 
 #if defined(__unix__) || defined(__unix) || defined(__linux__) || defined(__APPLE__)
     #define RS232_UNIX
-
-    #include <termios.h>
-
 #endif
 
 #include "rs232_baudrate_impl.hpp"
@@ -48,12 +45,42 @@ namespace sakurajin {
          */
         const std::string devname;
 
-        int r, port;    // Baudrate and Port Number
+        /**
+         * @brief A boolean that indicates if the port is available and a connection has been established
+         *
+         */
         bool available;
 
+        /**
+         * @brief The platform specific handle to the port
+         *
+         * This is a void pointer to prevent the need of including the platform specific header files.
+         * On windows this points to a HANDLE and on unix to an int.
+         */
         void* portHandle = nullptr;
-        
+
+        /**
+         * @brief The platform specific configuration of the port
+         *
+         * This is a void pointer to prevent the need of including the platform specific header files.
+         * On windows this points to a DCB and on unix to a termios.
+         */
+        void* portConfig = nullptr;
+
+        /*
+         * @brief The platform specific function to read a string from the port
+         * @param data the data that should be read from the port
+         * @param length the length of the data that should be read from the port
+         * @return int the number of bytes that were read from the port
+         */
         int Read(unsigned char *, int);
+
+        /*
+         * @brief The platform specific function to write a string to the port
+         * @param data the data that should be written to the port
+         * @param length the length of the data that should be written to the port
+         * @return int the number of bytes that were written to the port
+         */
         int Write(unsigned char *, int);
         
     public:
@@ -78,11 +105,13 @@ namespace sakurajin {
          * @return true the connection is established as expected
          * @return false there was an error while initializing the connection or some of the settings are not valid
          */
+        [[nodiscard]]
         bool IsAvailable() const;
 
         /**
          * @brief Get the name of the port used for this RS232 connection
          */
+        [[nodiscard]]
         std::string_view GetDeviceName() const;
         
         /**
@@ -169,6 +198,7 @@ namespace sakurajin {
          * @return true if the flag is set
          * @return false if the flag is not set
          */
+        [[nodiscard]]
         bool IsCTSEnabled();
     };
 

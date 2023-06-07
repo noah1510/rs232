@@ -36,7 +36,6 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
 
     if(*Cport == INVALID_HANDLE_VALUE){
         std::cerr << "unable to open comport" << std::endl;
-        delete getCport(portHandle);
         return;
     }
 
@@ -47,14 +46,12 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
     if(!BuildCommDCBA(baudr_conf.str().c_str(), &port_settings)){
         std::cerr << "unable to set comport dcb settings" << std::endl;
         CloseHandle(*Cport);
-        delete Cport;
         return;
     }
 
     if(!SetCommState(*Cport, &port_settings)){
         std::cerr << "unable to set comport cfg settings" << std::endl;
         CloseHandle(*Cport);
-        delete Cport;
         return;
     }
 
@@ -69,7 +66,6 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
     if(!SetCommTimeouts(*Cport, &Cptimeouts)){
         std::cerr << "unable to set comport time-out settings" << std::endl;
         CloseHandle(*Cport);
-        delete Cport;
         return;
     }
 

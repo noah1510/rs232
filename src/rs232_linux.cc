@@ -17,21 +17,26 @@
 #include <fcntl.h>
 #include <limits.h>
 
+inline int& getPort(void* portHandle){
+    return *static_cast<int*>(portHandle);
+}
+
 sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devname(deviceName), available(false){
 
     // Chossing baudrate
     unsigned int baudr = baudrate;
-    
-    port = open(devname.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-    if(port == -1){
+
+    portHandle = static_cast<void*>(new int{});
+    getPort(portHandle) = open(devname.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    if(getPort(portHandle) < 0){
         std::cerr << "unable to open comport "<< std::endl  ;
         return;
     }
 
-    portHandle = static_cast<void*>(new termios{});
-    int error = tcgetattr(port, static_cast<struct termios*>(portHandle));
-    if(error == -1){
-        close(port);
+    portConfig = static_cast<void*>(new termios{});
+    int error = tcgetattr(getPort(portHandle), static_cast<struct termios*>(portConfig));
+    if(error < 0){
+        close(getPort(portHandle));
         std::cerr << "unable to read portsettings " << std::endl;
         return;
     }
@@ -42,13 +47,13 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate) : devn
     nps.c_iflag = IGNPAR;
     nps.c_oflag = 0;
     nps.c_lflag = 0;
-    nps.c_cc[VMIN] = 0;      /* block untill n bytes are received */
-    nps.c_cc[VTIME] = 0;     /* block untill a timer expires (n * 100 mSec.) */
+    nps.c_cc[VMIN] = 0;      /* block until n bytes are received */
+    nps.c_cc[VTIME] = 0;     /* block until a timer expires (n * 100 mSec.) */
     
-    error = tcsetattr(port, TCSANOW, &nps);
-    if(error == -1){
-        close(port);
-        std::cerr << "unable to adjust portsettings " << std::endl;
+    error = tcsetattr(getPort(portHandle), TCSANOW, &nps);
+    if(error < 0){
+        close(getPort(portHandle));
+        std::cerr << "unable to adjust port settings " << std::endl;
         return;
     }
 
@@ -69,7 +74,7 @@ int sakurajin::RS232::Read(unsigned char *buf, int size){
         
     size = std::clamp(size, 0, limit);
 
-    return read(port, buf, size);
+    return read(getPort(portHandle), buf, size);
 }
 
 int sakurajin::RS232::Write(unsigned char *buf, int size){
@@ -77,14 +82,15 @@ int sakurajin::RS232::Write(unsigned char *buf, int size){
         return -1;
     }
 
-    return write(port, buf, size);
+    return write(getPort(portHandle), buf, size);
 }
 
 void sakurajin::RS232::Close(){
     available = false;
-    close(port);
-    tcsetattr(port, TCSANOW, static_cast<struct termios*>(portHandle));
-    delete static_cast<struct termios*>(portHandle);
+    close(getPort(portHandle));
+    tcsetattr(getPort(portHandle), TCSANOW, static_cast<struct termios*>(portConfig));
+    delete static_cast<int*>(portHandle);
+    delete static_cast<struct termios*>(portConfig);
 }
 
 /*
@@ -104,6 +110,6 @@ TIOCM_DSR   DSR (data set ready)
 */
 bool sakurajin::RS232::IsCTSEnabled(){
     int status;
-    status = ioctl(port, TIOCMGET, &status);
+    status = ioctl(getPort(portHandle), TIOCMGET, &status);
     return status & TIOCM_CTS;
 }
