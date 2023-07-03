@@ -1,23 +1,11 @@
-/*
-***************************************************************************
-*
-* Author: Frank Andre Moreno Vera
-*
-* Copyright (C) 2014 Frank Andre Moreno Vera
-*
-* frankmoreno1993@gmail.com
-*
-***************************************************************************
-*/
-
-#include "rs232.hpp"
+#include "rs232_native.hpp"
 #include <windows.h>
 
 inline HANDLE* getCport(void* portHandle){
     return static_cast<HANDLE*>(portHandle);
 }
 
-sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devname(deviceName){
+sakurajin::RS232_native::RS232_native(const std::string& deviceName, Baudrate baudrate):devname(deviceName){
 
     std::ostringstream baudr_conf;
     baudr_conf << "baud=" << baudrate << " data=8 parity=N stop=1";
@@ -74,7 +62,7 @@ sakurajin::RS232::RS232(const std::string& deviceName, Baudrate baudrate):devnam
     return;
 }
 
-int sakurajin::RS232::Read(unsigned char *buf, int size){
+int sakurajin::RS232_native::Read(unsigned char *buf, int size){
     if (!available){
         return -1;
     }
@@ -90,7 +78,7 @@ int sakurajin::RS232::Read(unsigned char *buf, int size){
     return n;
 }
 
-int sakurajin::RS232::Write(unsigned char * buf, int size){
+int sakurajin::RS232_native::Write(unsigned char * buf, int size){
     if (!available){
         return -1;
     }
@@ -104,13 +92,13 @@ int sakurajin::RS232::Write(unsigned char * buf, int size){
     return -1;
 }
 
-void sakurajin::RS232::Close(){
+void sakurajin::RS232_native::Close(){
     available = false;
     CloseHandle(*getCport(portHandle));
     delete getCport(portHandle);
 }
 
-bool sakurajin::RS232::IsCTSEnabled(){
+bool sakurajin::RS232_native::IsCTSEnabled(){
     int status;
     GetCommModemStatus(*getCport(portHandle), (LPDWORD)((void *)&status));
     return status & MS_CTS_ON;

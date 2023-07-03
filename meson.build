@@ -7,7 +7,7 @@ project(
         'c_std=c17',
     ],
     version : '1.3.0',
-    meson_version : '>= 0.55'
+    meson_version : '>= 1.1'
 
 )
 
@@ -68,7 +68,7 @@ cpp_headers = [
 # The array containing all the sources that will be compiled
 # The os specific sources will be added later
 sources = [
-    'src/rs232.cc'
+    'src/rs232.cpp'
 ]
 
 # check if the c++ headers exist and work
@@ -82,7 +82,7 @@ extra_linker_args = ''
 # check if the code is compiled on windows or any other system
 if host_machine.system() == 'windows'
     # add the windows source and check if the heads exist and work
-    sources += 'src/rs232_win.cc'
+    sources += 'src/rs232_native_win.cpp'
 
     foreach header_name : windows_c_headers
         cc.check_header(header_name, required: true)
@@ -90,7 +90,7 @@ if host_machine.system() == 'windows'
 
 else
     # add the unix source and check if the headers work
-    sources += 'src/rs232_linux.cc'
+    sources += 'src/rs232_native_linux.cpp'
 
     foreach header_name : unix_c_headers
         cc.check_header(header_name, required: true)
