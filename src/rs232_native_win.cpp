@@ -1,46 +1,58 @@
 #include "rs232_native.hpp"
-#include <windows.h>
 
-inline HANDLE* getCport(void* portHandle){
-    return static_cast<HANDLE*>(portHandle);
+#include "windows.h"
+
+#include <sstream>
+#include <algorithm>
+
+inline HANDLE& getCport(void* portHandle){
+    return *static_cast<HANDLE*>(portHandle);
 }
 
-sakurajin::RS232_native::RS232_native(const std::string& deviceName, Baudrate baudrate):devname(deviceName){
+inline DCB& getDCB(void* DCBHandle){
+    return *static_cast<DCB*>(DCBHandle);
+}
 
-    std::ostringstream baudr_conf;
+sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate baudrate, std::ostream& error_stream) {
+    if(connStatus == connectionStatus::connected){
+        return connStatus;
+    }
+
+    std::stringstream baudr_conf;
     baudr_conf << "baud=" << baudrate << " data=8 parity=N stop=1";
 
     portHandle = static_cast<void*>(new HANDLE{});
-    auto* Cport = getCport(portHandle);
-    *Cport = CreateFileA(
+    getCport(portHandle) = CreateFileA(
         devname.c_str(),
-          GENERIC_READ|GENERIC_WRITE,
-          0,                          /* no share  */
-          NULL,                       /* no security */
-          OPEN_EXISTING,
-          0,                          /* no threads */
-          NULL     /* no templates */
-    );                     
+        GENERIC_READ|GENERIC_WRITE,
+        0,                          /* no share  */
+        NULL,                       /* no security */
+        OPEN_EXISTING,
+        0,                          /* no threads */
+        NULL     /* no templates */
+    );
 
-    if(*Cport == INVALID_HANDLE_VALUE){
-        std::cerr << "unable to open comport" << std::endl;
-        return;
+    if(getCport(portHandle) == INVALID_HANDLE_VALUE){
+        error_stream << "unable to open comport:" << GetLastError();
+        connStatus = connectionStatus::portNotFound;
+        return connStatus;
     }
 
-    DCB port_settings;
-    memset(&port_settings, 0, sizeof(port_settings));  /* clear the new struct  */
-    port_settings.DCBlength = sizeof(port_settings);
+    portConfig = static_cast<void*>(new DCB{});
+    getDCB(portConfig).DCBlength = sizeof(DCB);
 
-    if(!BuildCommDCBA(baudr_conf.str().c_str(), &port_settings)){
-        std::cerr << "unable to set comport dcb settings" << std::endl;
-        CloseHandle(*Cport);
-        return;
+    if(!BuildCommDCBA(baudr_conf.str().c_str(), &getDCB(portConfig))){
+        error_stream << "unable to set comport dcb settings";
+        CloseHandle(getCport(portHandle));
+        connStatus = connectionStatus::otherError;
+        return connStatus;
     }
 
-    if(!SetCommState(*Cport, &port_settings)){
-        std::cerr << "unable to set comport cfg settings" << std::endl;
-        CloseHandle(*Cport);
-        return;
+    if(!SetCommState(getCport(portHandle), &getDCB(portConfig))){
+        error_stream << "unable to set comport cfg settings";
+        CloseHandle(getCport(portHandle));
+        connStatus = connectionStatus::otherError;
+        return connStatus;
     }
 
     COMMTIMEOUTS Cptimeouts;
@@ -51,55 +63,69 @@ sakurajin::RS232_native::RS232_native(const std::string& deviceName, Baudrate ba
     Cptimeouts.WriteTotalTimeoutMultiplier = 0;
     Cptimeouts.WriteTotalTimeoutConstant   = 0;
 
-    if(!SetCommTimeouts(*Cport, &Cptimeouts)){
-        std::cerr << "unable to set comport time-out settings" << std::endl;
-        CloseHandle(*Cport);
+    if(!SetCommTimeouts(getCport(portHandle), &Cptimeouts)){
+        error_stream << "unable to set comport time-out settings";
+        CloseHandle(getCport(portHandle));
+        connStatus = connectionStatus::otherError;
+        return connStatus;
+    }
+
+    connStatus = connectionStatus::connected;
+    return connStatus;
+}
+
+void sakurajin::RS232_native::disconnect() noexcept {
+    if(connStatus != connectionStatus::connected){
         return;
     }
 
-    available = true;
+    CloseHandle(getCport(portHandle));
 
-    return;
+    delete &getCport(portHandle);
+    delete &getDCB(portConfig);
+    portHandle = nullptr;
+    portConfig = nullptr;
+
+    connStatus = connectionStatus::disconnected;
 }
 
-int sakurajin::RS232_native::Read(unsigned char *buf, int size){
-    if (!available){
+int sakurajin::RS232_native::readRawData(unsigned char* data_location, int length){
+    if (connStatus != connectionStatus::connected){
         return -1;
     }
 
-    int n;
-
-    size = std::clamp(size, 0, 4096);
+    int n = 0;
+    length = std::clamp(length, 0, 4096);
 
   /* added the void pointer cast, otherwise gcc will complain about */
   /* "warning: dereferencing type-punned pointer will break strict aliasing rules" */
-    ReadFile(*getCport(portHandle), buf, size, (LPDWORD)((void *)&n), NULL);
-
+    ReadFile(getCport(portHandle), data_location, length, (LPDWORD)((void *)&n), NULL);
     return n;
 }
 
-int sakurajin::RS232_native::Write(unsigned char * buf, int size){
-    if (!available){
+int sakurajin::RS232_native::writeRawData(unsigned char* data_location, int length){
+    if (connStatus != connectionStatus::connected){
         return -1;
     }
 
-    int n;
+    int n = 0;
 
-    if(WriteFile(*getCport(portHandle), buf, size, (LPDWORD)((void *)&n), NULL)){
-      return n;
+    if(WriteFile(getCport(portHandle), data_location, length, (LPDWORD)((void *)&n), NULL)){
+        return n;
     }
 
     return -1;
 }
 
-void sakurajin::RS232_native::Close(){
-    available = false;
-    CloseHandle(*getCport(portHandle));
-    delete getCport(portHandle);
-}
+int sakurajin::RS232_native::retrieveFlags() {
+    if (connStatus != connectionStatus::connected){
+        return -1;
+    }
 
-bool sakurajin::RS232_native::IsCTSEnabled(){
-    int status;
-    GetCommModemStatus(*getCport(portHandle), (LPDWORD)((void *)&status));
-    return status & MS_CTS_ON;
+    DWORD status;
+    if(!GetCommModemStatus(getCport(portHandle), &status)){
+        return -1;
+    }
+
+    return static_cast<int>(status);
 }

@@ -47,12 +47,18 @@ namespace sakurajin {
         DATA_SET_READY_LINE_ENABLE = TIOCM_LE,
         DATA_TERMINAL_READY        = TIOCM_DTR,
         REQUEST_TO_SEND            = TIOCM_RTS,
-        SECONDARY_TXD              = TIOCM_ST,
-        SECONDARY_RXD              = TIOCM_SR,
         CLEAR_TO_SEND              = TIOCM_CTS,
         DATA_CARRIER_DETECT        = TIOCM_CAR,
         RING                       = TIOCM_RNG,
         DATA_SET_READY_2           = TIOCM_DSR,
+#else
+        DATA_SET_READY_LINE_ENABLE = 0x0020, //same as DATA_SET_READY_2
+        DATA_TERMINAL_READY        = 0x0080, //same as DATA_CARIEER_DETECT
+        REQUEST_TO_SEND            = 0x0010, //same as CLEAR_TO_SEND
+        CLEAR_TO_SEND              = 0x0010, //the value of MS_CTS_ON
+        DATA_CARRIER_DETECT        = 0x0080, //the value of MS_RLSD_ON
+        RING                       = 0x0040, //the value of MS_RING_ON
+        DATA_SET_READY_2           = 0x0020, //the value of MS_DSR_ON
 #endif
     };
 
@@ -171,6 +177,13 @@ namespace sakurajin {
          */
         [[nodiscard]]
         bool checkForFlag(portStatusFlags flag);
+
+        /**
+         * @brief retrieve all the flags that are set
+         * @return int the flags that are set
+         */
+        [[nodiscard]]
+        int retrieveFlags();
     };
 
 } // namespace sakurajin

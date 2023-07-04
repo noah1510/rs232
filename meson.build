@@ -6,7 +6,7 @@ project(
         'cpp_std=c++17',
         'c_std=c17',
     ],
-    version : '1.3.0',
+    version : '2.0.0',
     meson_version : '>= 1.1'
 
 )
@@ -68,7 +68,8 @@ cpp_headers = [
 # The array containing all the sources that will be compiled
 # The os specific sources will be added later
 sources = [
-    'src/rs232.cpp'
+    'src/rs232.cpp',
+    'src/rs232_native_common.cpp',
 ]
 
 # check if the c++ headers exist and work

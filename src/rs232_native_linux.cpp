@@ -15,15 +15,6 @@ inline struct termios& getTermios(void* termiosHandle) {
     return *static_cast<termios*>(termiosHandle);
 }
 
-sakurajin::RS232_native::RS232_native(const std::string& deviceName, Baudrate baudrate, std::ostream& error_stream)
-    : devname(deviceName) {
-    connStatus = connect(baudrate, error_stream);
-}
-
-sakurajin::RS232_native::~RS232_native() {
-    disconnect();
-}
-
 sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, std::ostream& error_stream) {
     if (connStatus == connectionStatus::connected) {
         return connStatus;
@@ -122,20 +113,15 @@ void sakurajin::RS232_native::disconnect() noexcept {
     portConfig = nullptr;
 }
 
-bool sakurajin::RS232_native::checkForFlag(sakurajin::portStatusFlags flag) {
+int sakurajin::RS232_native::retrieveFlags() {
     if (connStatus != connectionStatus::connected) {
-        return false;
+        return -1;
     }
 
     int status;
-    status = ioctl(getPort(portHandle), TIOCMGET, &status);
-    return status & flag;
-}
+    if(ioctl(getPort(portHandle), TIOCMGET, &status) < 0){
+        return -1;
+    }
 
-sakurajin::connectionStatus sakurajin::RS232_native::getConnectionStatus() {
-    return connStatus;
-}
-
-std::string_view sakurajin::RS232_native::getDeviceName() const {
-    return devname;
+    return status;
 }
