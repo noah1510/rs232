@@ -112,7 +112,7 @@ jobs:
   releases:
     name: "Release"
     runs-on: "ubuntu-22.04"
-    needs: [build_docs]
+    needs: [meson_cpp17_matrix]
     steps:
       - uses: actions/checkout@v3
       - name: "Release latest"
