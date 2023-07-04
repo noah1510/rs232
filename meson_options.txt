@@ -1,1 +1,8 @@
-option('build_sample', type : 'boolean', value : true, description: 'build the sample code to test if the lib works.')
+option(
+    'build_sample',
+    type : 'feature',
+    value : 'auto',
+    description: 'build the sample code to test if the lib works.',
+    deprecated: {'true': 'auto', 'false': 'disabled'}
+)
+

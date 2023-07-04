@@ -2,53 +2,52 @@
 
 #include "windows.h"
 
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
-inline HANDLE& getCport(void* portHandle){
+inline HANDLE& getCport(void* portHandle) {
     return *static_cast<HANDLE*>(portHandle);
 }
 
-inline DCB& getDCB(void* DCBHandle){
+inline DCB& getDCB(void* DCBHandle) {
     return *static_cast<DCB*>(DCBHandle);
 }
 
 sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate baudrate, std::ostream& error_stream) {
-    if(connStatus == connectionStatus::connected){
+    if (connStatus == connectionStatus::connected) {
         return connStatus;
     }
 
     std::stringstream baudr_conf;
     baudr_conf << "baud=" << baudrate << " data=8 parity=N stop=1";
 
-    portHandle = static_cast<void*>(new HANDLE{});
-    getCport(portHandle) = CreateFileA(
-        devname.c_str(),
-        GENERIC_READ|GENERIC_WRITE,
-        0,                          /* no share  */
-        NULL,                       /* no security */
-        OPEN_EXISTING,
-        0,                          /* no threads */
-        NULL     /* no templates */
+    portHandle           = static_cast<void*>(new HANDLE{});
+    getCport(portHandle) = CreateFileA(devname.c_str(),
+                                       GENERIC_READ | GENERIC_WRITE,
+                                       0,    /* no share  */
+                                       NULL, /* no security */
+                                       OPEN_EXISTING,
+                                       0,   /* no threads */
+                                       NULL /* no templates */
     );
 
-    if(getCport(portHandle) == INVALID_HANDLE_VALUE){
+    if (getCport(portHandle) == INVALID_HANDLE_VALUE) {
         error_stream << "unable to open comport:" << GetLastError();
         connStatus = connectionStatus::portNotFound;
         return connStatus;
     }
 
-    portConfig = static_cast<void*>(new DCB{});
+    portConfig                   = static_cast<void*>(new DCB{});
     getDCB(portConfig).DCBlength = sizeof(DCB);
 
-    if(!BuildCommDCBA(baudr_conf.str().c_str(), &getDCB(portConfig))){
+    if (!BuildCommDCBA(baudr_conf.str().c_str(), &getDCB(portConfig))) {
         error_stream << "unable to set comport dcb settings";
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
 
-    if(!SetCommState(getCport(portHandle), &getDCB(portConfig))){
+    if (!SetCommState(getCport(portHandle), &getDCB(portConfig))) {
         error_stream << "unable to set comport cfg settings";
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
@@ -63,7 +62,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     Cptimeouts.WriteTotalTimeoutMultiplier = 0;
     Cptimeouts.WriteTotalTimeoutConstant   = 0;
 
-    if(!SetCommTimeouts(getCport(portHandle), &Cptimeouts)){
+    if (!SetCommTimeouts(getCport(portHandle), &Cptimeouts)) {
         error_stream << "unable to set comport time-out settings";
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
@@ -75,7 +74,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
 }
 
 void sakurajin::RS232_native::disconnect() noexcept {
-    if(connStatus != connectionStatus::connected){
+    if (connStatus != connectionStatus::connected) {
         return;
     }
 
@@ -89,28 +88,28 @@ void sakurajin::RS232_native::disconnect() noexcept {
     connStatus = connectionStatus::disconnected;
 }
 
-int sakurajin::RS232_native::readRawData(unsigned char* data_location, int length){
-    if (connStatus != connectionStatus::connected){
+int sakurajin::RS232_native::readRawData(unsigned char* data_location, int length) {
+    if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
-    int n = 0;
+    int n  = 0;
     length = std::clamp(length, 0, 4096);
 
-  /* added the void pointer cast, otherwise gcc will complain about */
-  /* "warning: dereferencing type-punned pointer will break strict aliasing rules" */
-    ReadFile(getCport(portHandle), data_location, length, (LPDWORD)((void *)&n), NULL);
+    /* added the void pointer cast, otherwise gcc will complain about */
+    /* "warning: dereferencing type-punned pointer will break strict aliasing rules" */
+    ReadFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL);
     return n;
 }
 
-int sakurajin::RS232_native::writeRawData(unsigned char* data_location, int length){
-    if (connStatus != connectionStatus::connected){
+int sakurajin::RS232_native::writeRawData(unsigned char* data_location, int length) {
+    if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
     int n = 0;
 
-    if(WriteFile(getCport(portHandle), data_location, length, (LPDWORD)((void *)&n), NULL)){
+    if (WriteFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL)) {
         return n;
     }
 
@@ -118,12 +117,12 @@ int sakurajin::RS232_native::writeRawData(unsigned char* data_location, int leng
 }
 
 int sakurajin::RS232_native::retrieveFlags() {
-    if (connStatus != connectionStatus::connected){
+    if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
     DWORD status;
-    if(!GetCommModemStatus(getCport(portHandle), &status)){
+    if (!GetCommModemStatus(getCport(portHandle), &status)) {
         return -1;
     }
 

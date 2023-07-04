@@ -44,7 +44,6 @@ endif
 unix_c_headers = [
     'termios.h',
     'sys/ioctl.h',
-    'unistd.h',
     'fcntl.h',
     'limits.h',
 ]
@@ -56,13 +55,19 @@ windows_c_headers = [
 
 # All the required c++ headers, there are needed across all operating systems
 cpp_headers = [
+    'algorithm',
+    'atomic',
+    'chrono',
+    'filesystem',
+    'iostream',
+    'memory',
+    'ostream',
+    'shared_mutex',
+    'sstream',
     'string',
     'string_view',
     'tuple',
     'vector',
-    'sstream',
-    'algorithm',
-    'iostream',
 ]
 
 # The array containing all the sources that will be compiled
@@ -119,16 +124,15 @@ rs232_dep = declare_dependency(
     version: meson.project_version(),
 )
 
-if get_option('build_sample')
+
+build_sample = get_option('build_sample').enable_auto_if(not meson.is_subproject() ).enabled()
+
+if build_sample
+    message('Building sample programs')
+
     sample_src = [
         'interfaceTest'
     ]
-    
-    if host_machine.system() == 'windows'
-        message('No sample specific for windows exists yet! Feel free to open a merge request to add one.')
-    else
-        message('No sample specific for unix exists yet! Feel free to open a merge request to add one.')
-    endif
 
     foreach sample_program : sample_src
 
