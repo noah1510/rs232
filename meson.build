@@ -131,7 +131,8 @@ if build_sample
     message('Building sample programs')
 
     sample_src = [
-        'interfaceTest'
+        'interfaceTest',
+        'readInfinite',
     ]
 
     foreach sample_program : sample_src

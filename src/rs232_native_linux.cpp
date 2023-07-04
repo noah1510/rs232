@@ -15,6 +15,23 @@ inline struct termios& getTermios(void* termiosHandle) {
     return *static_cast<termios*>(termiosHandle);
 }
 
+std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) {
+
+    std::vector<std::string> allPorts;
+
+    //check every file in /dev for a match with the given regex pattern
+    //If it matches, add it to the list of available ports
+    for (const auto& entry : std::filesystem::directory_iterator("/dev")) {
+        auto filename = entry.path().string();
+        if (!std::regex_match(filename, pattern)) {
+            continue;
+        }
+        allPorts.push_back(filename);
+    }
+
+    return allPorts;
+}
+
 sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, std::ostream& error_stream) {
     if (connStatus == connectionStatus::connected) {
         return connStatus;
@@ -30,7 +47,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     }
 
     if (!std::filesystem::exists(devicePath)) {
-        error_stream << "device " << devicePath << " does not exist";
+        error_stream << "device " << devicePath << " does not exist" << std::endl;
         connStatus = connectionStatus::portNotFound;
         return connStatus;
     }
@@ -38,7 +55,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     portHandle          = static_cast<void*>(new int{});
     getPort(portHandle) = open(devicePath.string().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (getPort(portHandle) < 0) {
-        error_stream << "unable to open comport ";
+        error_stream << "unable to open comport " << std::endl;
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
@@ -47,7 +64,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     int error  = tcgetattr(getPort(portHandle), &getTermios(portConfig));
     if (error < 0) {
         close(getPort(portHandle));
-        error_stream << "unable to read port settings";
+        error_stream << "unable to read port settings" << std::endl;
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
@@ -73,7 +90,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     return connStatus;
 }
 
-int sakurajin::RS232_native::readRawData(unsigned char* data_location, int length) {
+int sakurajin::RS232_native::readRawData(char* data_location, int length) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -90,7 +107,7 @@ int sakurajin::RS232_native::readRawData(unsigned char* data_location, int lengt
     return read(getPort(portHandle), data_location, length);
 }
 
-int sakurajin::RS232_native::writeRawData(unsigned char* data_location, int length) {
+int sakurajin::RS232_native::writeRawData(char* data_location, int length) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }

@@ -11,22 +11,61 @@
 #include <string_view>
 #include <tuple>
 #include <vector>
+#include <regex>
 
 namespace sakurajin {
 
     class RS232_EXPORT_MACRO RS232 {
       private:
+        /**
+         * @brief The list of devices that are used for the connection
+         * This wrapper class uses a list of devices to allow the user to switch between devices without having to close the connection.
+         * This is useful when the user wants to use the same port for different purposes.
+         * Another purpose is to allow the user to specify different port names for the same device.
+         * This is needed since the port name can change depending on the operating system.
+         * For details on what capabilities are supported by the different operating systems see the documentation of the RS232_native
+         * class.
+         */
         std::vector<std::shared_ptr<RS232_native>> rs232Devices;
-        std::atomic<size_t>                        currentDevice = 0;
+
+        /**
+         * @brief The index of the current device that is used for the connection
+         *
+         * This index usually refers to the first connected device.
+         * If no device is connected the index can be anything however if possible it is a device that was connected before or is in theory
+         * available on the current OS.
+         */
+        std::atomic<size_t> currentDevice = 0;
 
       public:
         /**
-         * @brief Construct a new RS232 object
+         * @brief Construct a new RS232 object with a single device
+         * @note this constructor calls getAvailablePorts() to get a list of available ports and then calls the constructor with a list of
+         * devices.
+         *
+         * @param Rate The  rate that should be used for the connection
+         * @param errorStream The stream where error messages should be written to
+         */
+        RS232(Baudrate Rate, std::ostream& errorStream = std::cerr);
+
+        /**
+         * @brief Construct a new RS232 object with a single device
+         * @note this constructor just calls the one with a list of devices with a list size of 1.
          *
          * @param deviceName The name of the port where the device is connected to
          * @param Rate The  rate that should be used for the connection
+         * @param errorStream The stream where error messages should be written to
          */
-        RS232(const std::string& deviceName, Baudrate Rate);
+        RS232(const std::string& deviceName, Baudrate Rate, std::ostream& errorStream = std::cerr);
+
+        /**
+         * @brief Construct a new RS232 object with a list of devices
+         *
+         * @param deviceNames The list of names of the ports where the device may be connected to
+         * @param baudrate The baudrate that should be used for the connection
+         * @param errorStream The stream where error messages should be written to
+         */
+        RS232(const std::vector<std::string>& deviceNames, Baudrate baudrate, std::ostream& errorStream = std::cerr);
 
         /**
          * @brief Destroy the RS232.
@@ -36,19 +75,36 @@ namespace sakurajin {
         ~RS232();
 
         /**
-         * @brief Checks if the connection was started sucessfully
+         * @brief Get a pointer to a native device
+         * If the index is not a valid index the current device will be returned.
+         *
+         * @param index the index of the device that should be returned
+         */
+        std::shared_ptr<RS232_native> getNativeDevice(size_t index = -1) const;
+
+        /**
+         * @brief Get the number of devices that are added to this class
+         * @return The size of the list of devices
+         */
+        size_t getDeviceCount() const;
+
+        /**
+         * @brief Checks if the connection was started successfully
          *
          * @return true the connection is established as expected
          * @return false there was an error while initializing the connection or some of the settings are not valid
          */
         [[nodiscard]]
-        bool IsAvailable() const;
+        bool IsAvailable(size_t index = -1) const;
 
         /**
          * @brief Get the name of the port used for this RS232 connection
+         * If the index is not a valid index the current device will be checked.
+         *
+         * @param index the index of the device that should be used
          */
         [[nodiscard]]
-        std::string_view GetDeviceName() const;
+        std::string_view GetDeviceName(size_t index = -1) const;
 
         /**
          * @brief reads until the next character is received
@@ -119,7 +175,7 @@ namespace sakurajin {
          * @brief print a string to the currently connected device
          * @param text the test to send
          */
-        void Print(const std::string& text);
+        void Print(const std::string& text, std::ostream& errorStream = std::cerr);
 
         /**
          * @brief close the connection to the device.
@@ -142,4 +198,4 @@ namespace sakurajin {
 
 #include "rs232_template_implementations.hpp"
 
-#endif // RS232_HPP_INCLUDED
+#endif // SAKURAJIN_RS232_HPP_INCLUDED

@@ -15,8 +15,8 @@ sakurajin::RS232::ReadNextChar(std::chrono::duration<Rep, Period> waitTime, bool
 
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    unsigned char IOBuf   = '\0';
-    int           errCode = 0;
+    char IOBuf   = '\0';
+    int  errCode = 0;
 
     do {
         errCode = transferDevice->readRawData(&IOBuf, 1);
@@ -47,10 +47,10 @@ sakurajin::RS232::ReadUntil(const std::vector<unsigned char>& conditions, std::c
         return {"", -1};
     }
 
-    std::string   message  = "";
-    int           errCode  = 0;
-    unsigned char nextChar = '\n';
-    bool          stop     = false;
+    std::string message  = "";
+    int         errCode  = 0;
+    char        nextChar = '\n';
+    bool        stop     = false;
 
     while (!stop) {
         // read the next char and append if there was no error

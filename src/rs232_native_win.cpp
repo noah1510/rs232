@@ -4,6 +4,16 @@
 
 #include <algorithm>
 #include <sstream>
+#include <locale>
+#include <codecvt>
+
+static inline std::string wstrToStr(const std::wstring &wstr){
+    if( wstr.empty() ) return "";
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo( size_needed, 0 );
+    WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    return strTo;
+}
 
 inline HANDLE& getCport(void* portHandle) {
     return *static_cast<HANDLE*>(portHandle);
@@ -11,6 +21,29 @@ inline HANDLE& getCport(void* portHandle) {
 
 inline DCB& getDCB(void* DCBHandle) {
     return *static_cast<DCB*>(DCBHandle);
+}
+
+std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) {
+    std::vector<std::string> allPorts;
+    wchar_t lpTargetPath[5000];
+
+    for (uint8_t i = 0; i < 255; i++) {
+        std::wstringstream wss;
+        wss << "\\\\.\\COM" << i;
+        DWORD res = QueryDosDeviceW(wss.str().c_str(), lpTargetPath, 5000);
+
+        // Test the return value and error if any
+        if (res != 0) {
+            std::string narrowString = wstrToStr(wss.str());
+            if(std::regex_match(narrowString, pattern)){
+                allPorts.push_back(narrowString);
+            }
+            std::cout << narrowString << ": " << lpTargetPath << std::endl;
+        }
+    }
+
+    allPorts.shrink_to_fit();
+    return allPorts;
 }
 
 sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate baudrate, std::ostream& error_stream) {
@@ -32,7 +65,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     );
 
     if (getCport(portHandle) == INVALID_HANDLE_VALUE) {
-        error_stream << "unable to open comport:" << GetLastError();
+        error_stream << "unable to open comport:" << GetLastError() << std::endl;
         connStatus = connectionStatus::portNotFound;
         return connStatus;
     }
@@ -41,14 +74,14 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     getDCB(portConfig).DCBlength = sizeof(DCB);
 
     if (!BuildCommDCBA(baudr_conf.str().c_str(), &getDCB(portConfig))) {
-        error_stream << "unable to set comport dcb settings";
+        error_stream << "unable to set comport dcb settings" << std::endl;
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
 
     if (!SetCommState(getCport(portHandle), &getDCB(portConfig))) {
-        error_stream << "unable to set comport cfg settings";
+        error_stream << "unable to set comport cfg settings" << std::endl;
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
         return connStatus;
@@ -63,7 +96,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     Cptimeouts.WriteTotalTimeoutConstant   = 0;
 
     if (!SetCommTimeouts(getCport(portHandle), &Cptimeouts)) {
-        error_stream << "unable to set comport time-out settings";
+        error_stream << "unable to set comport time-out settings" << std::endl;
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
         return connStatus;
@@ -88,7 +121,7 @@ void sakurajin::RS232_native::disconnect() noexcept {
     connStatus = connectionStatus::disconnected;
 }
 
-int sakurajin::RS232_native::readRawData(unsigned char* data_location, int length) {
+int sakurajin::RS232_native::readRawData(char* data_location, int length) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -102,7 +135,7 @@ int sakurajin::RS232_native::readRawData(unsigned char* data_location, int lengt
     return n;
 }
 
-int sakurajin::RS232_native::writeRawData(unsigned char* data_location, int length) {
+int sakurajin::RS232_native::writeRawData(char* data_location, int length) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }

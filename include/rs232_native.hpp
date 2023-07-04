@@ -18,6 +18,7 @@
 #include <shared_mutex>
 #include <string>
 #include <string_view>
+#include <regex>
 
 namespace sakurajin {
     /**
@@ -50,7 +51,7 @@ namespace sakurajin {
         CLEAR_TO_SEND              = TIOCM_CTS,
         DATA_CARRIER_DETECT        = TIOCM_CAR,
         RING                       = TIOCM_RNG,
-        DATA_SET_READY_2           = TIOCM_DSR,
+        DATA_SET_READY_2           = TIOCM_DSR
 #else
         DATA_SET_READY_LINE_ENABLE = 0x0020, //same as DATA_SET_READY_2
         DATA_TERMINAL_READY        = 0x0080, //same as DATA_CARIEER_DETECT
@@ -58,9 +59,12 @@ namespace sakurajin {
         CLEAR_TO_SEND              = 0x0010, //the value of MS_CTS_ON
         DATA_CARRIER_DETECT        = 0x0080, //the value of MS_RLSD_ON
         RING                       = 0x0040, //the value of MS_RING_ON
-        DATA_SET_READY_2           = 0x0020, //the value of MS_DSR_ON
+        DATA_SET_READY_2           = 0x0020 //the value of MS_DSR_ON
 #endif
     };
+
+    RS232_EXPORT_MACRO std::vector<std::string> getAvailablePorts();
+    RS232_EXPORT_MACRO std::vector<std::string> getMatchingPorts(std::regex pattern);
 
     /**
      * @brief The native implementation of RS232
@@ -143,7 +147,7 @@ namespace sakurajin {
          * @return int the number of bytes that were read from the port
          */
         [[nodiscard]]
-        int readRawData(unsigned char* data_location, int length);
+        int readRawData(char* data_location, int length);
 
         /*
          * @brief The platform specific function to write a string to the port
@@ -152,7 +156,7 @@ namespace sakurajin {
          * @return int the number of bytes that were written to the port
          */
         [[nodiscard]]
-        int writeRawData(unsigned char* data_location, int length);
+        int writeRawData(char* data_location, int length);
 
         /**
          * @brief Checks if the connection was started successfully
