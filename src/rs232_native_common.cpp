@@ -36,10 +36,10 @@ std::vector<std::string> sakurajin::getAvailablePorts() {
         rgx("/dev/ttyUSB[0-9]+"),
         rgx("/dev/ttyACM[0-9]+"),
         rgx("\\./COM[0-9]+"),
-        rgx("/dev/tty.usbmodem[0-9]+"),
-        rgx("/dev/tty.usbserial[0-9]+"),
         rgx("/dev/cu\\.[a-zA-Z0-9]+"),
-        rgx("/dev/cuaU[0-9]+")
+        rgx("/dev/cuaU[0-9]+"),
+        rgx("/dev/tty.usbmodem[0-9]+"),
+        rgx("/dev/tty.usbserial[0-9]+")
     };
 
     for (const auto& pattern : patters) {

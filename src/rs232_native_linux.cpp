@@ -55,7 +55,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     portHandle          = static_cast<void*>(new int{});
     getPort(portHandle) = open(devicePath.string().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (getPort(portHandle) < 0) {
-        error_stream << "unable to open comport " << devicePath << std::endl;
+        error_stream << "unable to open device port " << devicePath << std::endl;
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
