@@ -55,7 +55,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     portHandle          = static_cast<void*>(new int{});
     getPort(portHandle) = open(devicePath.string().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (getPort(portHandle) < 0) {
-        error_stream << "unable to open comport " << std::endl;
+        error_stream << "unable to open comport " << devicePath << std::endl;
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
@@ -64,7 +64,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     int error  = tcgetattr(getPort(portHandle), &getTermios(portConfig));
     if (error < 0) {
         close(getPort(portHandle));
-        error_stream << "unable to read port settings" << std::endl;
+        error_stream << "unable to read port settings for " << devicePath << std::endl;
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
@@ -81,7 +81,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     error = tcsetattr(getPort(portHandle), TCSANOW, &nps);
     if (error < 0) {
         close(getPort(portHandle));
-        error_stream << "unable to adjust port settings " << std::endl;
+        error_stream << "unable to adjust port settings for " << devicePath << std::endl;
         connStatus = connectionStatus::otherError;
         return connStatus;
     }

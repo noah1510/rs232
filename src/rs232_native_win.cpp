@@ -65,7 +65,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     );
 
     if (getCport(portHandle) == INVALID_HANDLE_VALUE) {
-        error_stream << "unable to open comport:" << GetLastError() << std::endl;
+        error_stream << "unable to open comport " << devname << " message:" << GetLastError() << std::endl;
         connStatus = connectionStatus::portNotFound;
         return connStatus;
     }
@@ -74,14 +74,14 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     getDCB(portConfig).DCBlength = sizeof(DCB);
 
     if (!BuildCommDCBA(baudr_conf.str().c_str(), &getDCB(portConfig))) {
-        error_stream << "unable to set comport dcb settings" << std::endl;
+        error_stream << "unable to set comport dcb settings for " << devname << std::endl;
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
         return connStatus;
     }
 
     if (!SetCommState(getCport(portHandle), &getDCB(portConfig))) {
-        error_stream << "unable to set comport cfg settings" << std::endl;
+        error_stream << "unable to set comport cfg settings for " << devname << std::endl;
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
         return connStatus;
@@ -96,7 +96,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     Cptimeouts.WriteTotalTimeoutConstant   = 0;
 
     if (!SetCommTimeouts(getCport(portHandle), &Cptimeouts)) {
-        error_stream << "unable to set comport time-out settings" << std::endl;
+        error_stream << "unable to set comport time-out settings for " << devname << std::endl;
         CloseHandle(getCport(portHandle));
         connStatus = connectionStatus::otherError;
         return connStatus;
