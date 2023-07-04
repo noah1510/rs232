@@ -3,63 +3,139 @@ name: "CI"
 on:
   push:
     branches-ignore:
-      - 'stable'
-      - 'main'
       - 'restyled/*'
+      - 'pages'
+    tags-ignore:
+      - 'latest'
 
 jobs:
+  meson_cpp17_matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-20.04", "ubuntu-22.04", "macos-latest", "windows-latest"]
+        buildType: ["static", "shared"]
+        useMsys: [true, false]
+        exclude:
+          - useMsys: true
+            os: "ubuntu-20.04"
+          - useMsys: true
+            os: "ubuntu-22.04"
+          - useMsys: true
+            os: "macos-latest"
+        include:
+          - setupExtras: "-Db_lto=false -Dgtest:b_lto=false"
+            os: "windows-latest"
 
-  ubunut20:
-    name: "ubuntu compile and test"
-    runs-on: "ubuntu-20.04"
+    name: ${{ matrix.os }} ${{ matrix.buildType }} msys ${{ matrix.useMsys }}
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1          
-      - uses: BSFishy/meson-build@v1.0.2
-        name: build full
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - name: default - Prepare MSVC
+        if: ${{ !matrix.useMsys && matrix.os == 'windows-latest' }}
+        uses: bus1/cabuild/action/msdevshell@v1
         with:
-          action: build
-          directory: build
-          options: --verbose
-          meson-version: 0.61.3
-      - name: clearing build directory
-        run: rm -rf build
+          architecture: x64
 
-  windows:
-    name: "windows compile and test"
-    runs-on: "windows-latest"
-    steps:
-      - uses: actions/checkout@v1
+      - name: default - install meson and ninja
+        if: ${{ !matrix.useMsys }}
+        run: |
+          pipx install meson
+          pipx install ninja
+
+      - name: default - setup the project
+        if: ${{ !matrix.useMsys }}
+        run: meson setup ${{ matrix.setupExtras }} -Ddefault_library=${{ matrix.buildType }} build
+      - name: default - compile the project
+        if: ${{ !matrix.useMsys }}
+        run: meson compile -C build
+      - name: default - test the project
+        if: ${{ !matrix.useMsys }}
+        run: meson test --verbose -C build
+
       - uses: msys2/setup-msys2@v2
+        if: ${{ matrix.useMsys }}
         with:
           update: true
           install: >-
-            git
             base-devel
             mingw-w64-x86_64-python3
+            mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
             mingw-w64-x86_64-meson
-      - name: compile rs232 lib 
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-pkg-config
+
+      - name: msys2 - setup the project
+        if: ${{ matrix.useMsys }}
         shell: msys2 {0}
-        run: |
-          meson setup  -Ddefault_library=static -Db_lto=true -Db_pgo=off build
-          meson compile -C build
-          meson test -C build
-      - name: clearing build directory
-        run: Remove-Item -recurse -force build
-   
-  macos:
-    name: "mac os compile and test"
-    runs-on: "macos-latest"
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1                
-      - uses: BSFishy/meson-build@v1.0.2
-        name: build full
+        run: meson setup ${{ matrix.setupExtras }} -Ddefault_library=${{ matrix.buildType }} build
+      - name: msys2 - compile the project
+        if: ${{ matrix.useMsys }}
+        shell: msys2 {0}
+        run: meson compile -C build
+      - name: msys2 - test the project
+        if: ${{ matrix.useMsys }}
+        shell: msys2 {0}
+        run: meson test --verbose -C build
+
+      - uses: actions/upload-artifact@v3
+        if: failure()
         with:
-          action: build
-          directory: build
-          options: --verbose
-          meson-version: 0.61.3
-      - name: clearing build directory
-        run: rm -rf build
-        
+          name: build-artifact-${{ matrix.os }}-${{ matrix.buildType }}-msys-${{ matrix.useMsys }}
+          path: build
+
+  build_docs:
+    name: "Build and push documentation"
+    runs-on: "ubuntu-22.04"
+    needs: [meson_cpp17_matrix]
+    if: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: install dependencies
+        if: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+        run: sudo apt install doxygen graphviz
+      - name: generate docs
+        if: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+        run: doxygen
+      - name: Deploy docs
+        if: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+        uses: s0/git-publish-subdir-action@master
+        env:
+          REPO: self
+          BRANCH: gh-pages
+          FOLDER: doc/html
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  releases:
+    name: "Release"
+    runs-on: "ubuntu-22.04"
+    needs: [build_docs]
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Release latest"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+
+      - name: "Release stable"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        if: ${{ github.ref_type == 'branch' && github.ref_name == 'stable' }}
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "stable"
+          prerelease: false
+          title: "stable Build"
+
+      - name: "Release tagged"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        if: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: ${{ contains(github.ref_name, '-rc') }}
