@@ -50,7 +50,7 @@ int main (int argc, char **argv) {
 
     // Closing port
     std::cout << "\nClosing Serialport ..." << std::endl;
-    h.Close();
+    h.DisconnectAll();
 
     return 0;
 }

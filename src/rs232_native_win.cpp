@@ -132,9 +132,9 @@ ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bo
 
     return callWithOptionalLock(block, [this, data_location, length]() {
         int n  = 0;
-        length = std::clamp(length, 0, 4096);
+        auto local_len = std::clamp(length, 0, 4096);
 
-        auto success = ReadFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL);
+        auto success = ReadFile(getCport(portHandle), data_location, local_len, (LPDWORD)((void*)&n), NULL);
         return (ssize_t)(success ? n : -1);
     });
 }
@@ -146,9 +146,9 @@ ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, b
 
     return callWithOptionalLock(block, [this, data_location, length]() {
         int n  = 0;
-        length = std::clamp(length, 0, 4096);
+        auto local_len = std::clamp(length, 0, 4096);
 
-        auto success = WriteFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL);
+        auto success = WriteFile(getCport(portHandle), data_location, local_len, (LPDWORD)((void*)&n), NULL);
         return (ssize_t)(success ? n : -1);
     });
 }
@@ -158,7 +158,7 @@ ssize_t sakurajin::RS232_native::retrieveFlags(bool block) noexcept {
         return -1;
     }
 
-    return callWithOptionalLock(block, [this]() {
+    return callWithOptionalLock(block, [this](){
         DWORD flags;
         if (!GetCommModemStatus(getCport(portHandle), &flags)) {
             return (ssize_t)(-1);
