@@ -5,15 +5,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-inline int& getPort(void* portHandle) {
+inline int& getPort(void* portHandle) noexcept {
     return *static_cast<int*>(portHandle);
 }
 
-inline struct termios& getTermios(void* termiosHandle) {
+inline struct termios& getTermios(void* termiosHandle) noexcept {
     return *static_cast<termios*>(termiosHandle);
 }
 
-std::vector<std::string> sakurajin::getMatchingPorts(const std::regex& pattern) {
+std::vector<std::string> sakurajin::getMatchingPorts(const std::regex& pattern) noexcept {
 
     std::vector<std::string> allPorts;
 
@@ -30,12 +30,12 @@ std::vector<std::string> sakurajin::getMatchingPorts(const std::regex& pattern) 
     return allPorts;
 }
 
-sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, std::ostream& error_stream) {
+sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, std::ostream& error_stream) noexcept {
     if (connStatus == connectionStatus::connected) {
         return connStatus;
     }
 
-    //make sure no read or write operation is performed while the port is being opened
+    // make sure no read or write operation is performed while the port is being opened
     std::scoped_lock lock{dataAccessMutex};
 
     // convert the baudrate to int
@@ -47,14 +47,14 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
         devicePath = "/dev" / devicePath;
     }
 
-    //if the file does not exist, return an error
+    // if the file does not exist, return an error
     if (!std::filesystem::exists(devicePath)) {
         error_stream << "device " << devicePath << " does not exist" << std::endl;
         connStatus = connectionStatus::portNotFound;
         return connStatus;
     }
 
-    //open the port and return an error if that fails
+    // open the port and return an error if that fails
     portHandle          = static_cast<void*>(new int{});
     getPort(portHandle) = open(devicePath.string().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (getPort(portHandle) < 0) {
@@ -63,7 +63,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
         return connStatus;
     }
 
-    //get the current port settings and return an error if that fails
+    // get the current port settings and return an error if that fails
     portConfig = static_cast<void*>(new termios{});
     int error  = tcgetattr(getPort(portHandle), &getTermios(portConfig));
     if (error < 0) {
@@ -94,7 +94,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     return connStatus;
 }
 
-ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool lock) {
+ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool lock) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -111,7 +111,7 @@ ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bo
     return callWithOptionalLock(lock, [this, data_location, length]() { return read(getPort(portHandle), data_location, length); });
 }
 
-ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool lock) {
+ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool lock) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -124,23 +124,23 @@ void sakurajin::RS232_native::disconnect() noexcept {
         return;
     }
 
-    //lock the mutex to make sure the port is not accessed while it is being closed
+    // lock the mutex to make sure the port is not accessed while it is being closed
     std::scoped_lock lock(dataAccessMutex);
 
     connStatus = connectionStatus::disconnected;
 
-    //close the port handles
+    // close the port handles
     close(getPort(portHandle));
     tcsetattr(getPort(portHandle), TCSANOW, &getTermios(portConfig));
 
-    //free the memory and set the pointers to nullptr
+    // free the memory and set the pointers to nullptr
     delete &getPort(portHandle);
     delete &getTermios(portConfig);
     portHandle = nullptr;
     portConfig = nullptr;
 }
 
-ssize_t sakurajin::RS232_native::retrieveFlags(bool block) {
+ssize_t sakurajin::RS232_native::retrieveFlags(bool block) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }

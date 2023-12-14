@@ -68,8 +68,8 @@ namespace sakurajin {
 #endif
     };
 
-    RS232_EXPORT_MACRO std::vector<std::string> getAvailablePorts();
-    RS232_EXPORT_MACRO std::vector<std::string> getMatchingPorts(const std::regex& pattern);
+    RS232_EXPORT_MACRO std::vector<std::string> getAvailablePorts() noexcept;
+    RS232_EXPORT_MACRO std::vector<std::string> getMatchingPorts(const std::regex& pattern) noexcept;
 
     /**
      * @brief The native implementation of RS232

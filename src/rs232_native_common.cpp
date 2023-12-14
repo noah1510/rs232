@@ -12,15 +12,15 @@ sakurajin::RS232_native::~RS232_native() {
     disconnect();
 }
 
-sakurajin::connectionStatus sakurajin::RS232_native::getConnectionStatus() {
+sakurajin::connectionStatus sakurajin::RS232_native::getConnectionStatus() noexcept {
     return connStatus;
 }
 
-std::string_view sakurajin::RS232_native::getDeviceName() const {
+std::string_view sakurajin::RS232_native::getDeviceName() const noexcept {
     return devname;
 }
 
-bool sakurajin::RS232_native::checkForFlag(sakurajin::portStatusFlags flag, bool block) {
+bool sakurajin::RS232_native::checkForFlag(sakurajin::portStatusFlags flag, bool block) noexcept {
     auto flags = retrieveFlags(block);
     if (flags < 0) {
         return false;
@@ -28,7 +28,7 @@ bool sakurajin::RS232_native::checkForFlag(sakurajin::portStatusFlags flag, bool
     return (flags & static_cast<ssize_t>(flag)) != 0;
 }
 
-std::vector<std::string> sakurajin::getAvailablePorts() {
+std::vector<std::string> sakurajin::getAvailablePorts() noexcept {
     std::vector<std::string> allPorts;
 
     // All the regex patterns to check for available ports

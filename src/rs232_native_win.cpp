@@ -5,7 +5,7 @@
 #include <codecvt>
 #include <locale>
 
-static inline std::string wstrToStr(const std::wstring& wstr) {
+static inline std::string wstrToStr(const std::wstring& wstr) noexcept {
     if (wstr.empty()) {
         return "";
     }
@@ -15,15 +15,15 @@ static inline std::string wstrToStr(const std::wstring& wstr) {
     return strTo;
 }
 
-inline HANDLE& getCport(void* portHandle) {
+inline HANDLE& getCport(void* portHandle) noexcept {
     return *static_cast<HANDLE*>(portHandle);
 }
 
-inline DCB& getDCB(void* DCBHandle) {
+inline DCB& getDCB(void* DCBHandle) noexcept {
     return *static_cast<DCB*>(DCBHandle);
 }
 
-std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) {
+std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) noexcept {
     std::vector<std::string> allPorts;
     wchar_t                  lpTargetPath[5000];
 
@@ -46,7 +46,7 @@ std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) {
     return allPorts;
 }
 
-sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate baudrate, std::ostream& error_stream) {
+sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate baudrate, std::ostream& error_stream) noexcept {
     if (connStatus == connectionStatus::connected) {
         return connStatus;
     }
@@ -125,7 +125,7 @@ void sakurajin::RS232_native::disconnect() noexcept {
     connStatus = connectionStatus::disconnected;
 }
 
-ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool block) {
+ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool block) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -139,7 +139,7 @@ ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bo
     });
 }
 
-ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool block) {
+ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool block) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -153,7 +153,7 @@ ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, b
     });
 }
 
-ssize_t sakurajin::RS232_native::retrieveFlags(bool block) {
+ssize_t sakurajin::RS232_native::retrieveFlags(bool block) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
