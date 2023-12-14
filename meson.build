@@ -45,7 +45,6 @@ unix_c_headers = [
     'termios.h',
     'sys/ioctl.h',
     'fcntl.h',
-    'limits.h',
 ]
 
 # All the headers required to compile the lib on windows
@@ -60,6 +59,7 @@ cpp_headers = [
     'chrono',
     'filesystem',
     'iostream',
+    'climits',
     'memory',
     'ostream',
     'shared_mutex',

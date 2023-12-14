@@ -10,6 +10,9 @@
 build
 doc
 
+# build system files
+.meson-subproject-wrap-hash.txt
+
 # ide folders and files
 *.pro*
 *.kdev4*

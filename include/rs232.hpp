@@ -6,12 +6,12 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <tuple>
 #include <vector>
-#include <regex>
 
 namespace sakurajin {
 
@@ -46,7 +46,8 @@ namespace sakurajin {
          * @param Rate The  rate that should be used for the connection
          * @param errorStream The stream where error messages should be written to
          */
-        RS232(Baudrate Rate, std::ostream& errorStream = std::cerr);
+        [[maybe_unused]]
+        explicit RS232(Baudrate Rate, std::ostream& errorStream = std::cerr);
 
         /**
          * @brief Construct a new RS232 object with a single device
@@ -56,6 +57,7 @@ namespace sakurajin {
          * @param Rate The  rate that should be used for the connection
          * @param errorStream The stream where error messages should be written to
          */
+        [[maybe_unused]]
         RS232(const std::string& deviceName, Baudrate Rate, std::ostream& errorStream = std::cerr);
 
         /**
@@ -65,6 +67,7 @@ namespace sakurajin {
          * @param baudrate The baudrate that should be used for the connection
          * @param errorStream The stream where error messages should be written to
          */
+        [[maybe_unused]]
         RS232(const std::vector<std::string>& deviceNames, Baudrate baudrate, std::ostream& errorStream = std::cerr);
 
         /**
@@ -80,12 +83,14 @@ namespace sakurajin {
          *
          * @param index the index of the device that should be returned
          */
+        [[nodiscard]] [[maybe_unused]]
         std::shared_ptr<RS232_native> getNativeDevice(size_t index = -1) const;
 
         /**
          * @brief Get the number of devices that are added to this class
          * @return The size of the list of devices
          */
+        [[nodiscard]] [[maybe_unused]]
         size_t getDeviceCount() const;
 
         /**
@@ -94,7 +99,7 @@ namespace sakurajin {
          * @return true the connection is established as expected
          * @return false there was an error while initializing the connection or some of the settings are not valid
          */
-        [[nodiscard]]
+        [[nodiscard]] [[maybe_unused]]
         bool IsAvailable(size_t index = -1) const;
 
         /**
@@ -103,7 +108,7 @@ namespace sakurajin {
          *
          * @param index the index of the device that should be used
          */
-        [[nodiscard]]
+        [[nodiscard]] [[maybe_unused]]
         std::string_view GetDeviceName(size_t index = -1) const;
 
         /**
@@ -112,6 +117,7 @@ namespace sakurajin {
          * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
          * The return value is >= 0 if everything is okay and < 0 if something went wrong
          */
+        [[nodiscard]] [[maybe_unused]]
         std::tuple<unsigned char, int> ReadNextChar();
 
         /**
@@ -124,6 +130,7 @@ namespace sakurajin {
          * The return value is >= 0 if everything is okay and < 0 if something went wrong
          */
         template <class Rep = int64_t, class Period = std::ratio<1>>
+        [[nodiscard]] [[maybe_unused]]
         std::tuple<unsigned char, int> ReadNextChar(std::chrono::duration<Rep, Period> waitTime,
                                                     bool                               ignoreTime     = false,
                                                     std::shared_ptr<RS232_native>      transferDevice = nullptr);
@@ -133,6 +140,7 @@ namespace sakurajin {
          *
          * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
          */
+        [[nodiscard]] [[maybe_unused]]
         std::tuple<std::string, int> ReadNextMessage();
 
         /**
@@ -146,6 +154,7 @@ namespace sakurajin {
          * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
          */
         template <class Rep = int64_t, class Period = std::ratio<1>>
+        [[nodiscard]] [[maybe_unused]]
         std::tuple<std::string, int> ReadNextMessage(std::chrono::duration<Rep, Period> waitTime, bool ignoreTime = false);
 
         /**
@@ -154,6 +163,7 @@ namespace sakurajin {
          * @param conditions a vector containing all the stop conditions.
          * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
          */
+        [[nodiscard]] [[maybe_unused]]
         std::tuple<std::string, int> ReadUntil(const std::vector<unsigned char>& conditions);
 
         /**
@@ -168,6 +178,7 @@ namespace sakurajin {
          * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
          */
         template <class Rep = int64_t, class Period = std::ratio<1>>
+        [[nodiscard]] [[maybe_unused]]
         std::tuple<std::string, int>
         ReadUntil(const std::vector<unsigned char>& conditions, std::chrono::duration<Rep, Period> waitTime, bool ignoreTime = false);
 
@@ -175,6 +186,7 @@ namespace sakurajin {
          * @brief print a string to the currently connected device
          * @param text the test to send
          */
+        [[maybe_unused]]
         void Print(const std::string& text, std::ostream& errorStream = std::cerr);
 
         /**
@@ -182,7 +194,14 @@ namespace sakurajin {
          * @warning this disables all following transactions to the device.
          *
          */
+        [[deprecated("use DisconnectAll() instead")]]
         void Close();
+
+        [[maybe_unused]]
+        bool Connect();
+
+        [[maybe_unused]]
+        void DisconnectAll();
 
         /**
          * @brief check if the clear to send flag is set
@@ -190,8 +209,8 @@ namespace sakurajin {
          * @return true if the flag is set
          * @return false if the flag is not set
          */
-        [[nodiscard]]
-        bool IsCTSEnabled();
+        [[nodiscard]] [[maybe_unused]]
+        bool IsCTSEnabled() const;
     };
 
 } // namespace sakurajin

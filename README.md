@@ -10,7 +10,7 @@ All the C support was dropped and huge code changes were made to make this a pro
 If you use meson, just add the following to your `meson.build` and clone the repo in you subprojects folder:
 
 ```meson
-rs232_dep = dependency('rs232', version: '>=0.1.0')
+rs232_dep = dependency('rs232', version: '>=2.0.0')
 ```
 
 For other build systems, you have to compile the library and run the meson install command.

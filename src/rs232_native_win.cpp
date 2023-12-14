@@ -3,15 +3,17 @@
 #include "windows.h"
 
 #include <algorithm>
-#include <sstream>
-#include <locale>
 #include <codecvt>
+#include <locale>
+#include <sstream>
 
-static inline std::string wstrToStr(const std::wstring &wstr){
-    if( wstr.empty() ) return "";
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-    std::string strTo( size_needed, 0 );
-    WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+static inline std::string wstrToStr(const std::wstring& wstr) {
+    if (wstr.empty()) {
+        return "";
+    }
+    auto        size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo{size_needed, 0};
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
     return strTo;
 }
 
@@ -25,7 +27,7 @@ inline DCB& getDCB(void* DCBHandle) {
 
 std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) {
     std::vector<std::string> allPorts;
-    wchar_t lpTargetPath[5000];
+    wchar_t                  lpTargetPath[5000];
 
     for (uint8_t i = 0; i < 255; i++) {
         std::wstringstream wss;
@@ -35,7 +37,7 @@ std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) {
         // Test the return value and error if any
         if (res != 0) {
             std::string narrowString = wstrToStr(wss.str());
-            if(std::regex_match(narrowString, pattern)){
+            if (std::regex_match(narrowString, pattern)) {
                 allPorts.push_back(narrowString);
             }
             std::cout << narrowString << ": " << lpTargetPath << std::endl;
@@ -121,7 +123,7 @@ void sakurajin::RS232_native::disconnect() noexcept {
     connStatus = connectionStatus::disconnected;
 }
 
-int sakurajin::RS232_native::readRawData(char* data_location, int length) {
+ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool lock) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -135,7 +137,7 @@ int sakurajin::RS232_native::readRawData(char* data_location, int length) {
     return n;
 }
 
-int sakurajin::RS232_native::writeRawData(char* data_location, int length) {
+ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool lock) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }

@@ -1,6 +1,12 @@
 #include "rs232.hpp"
 #include <iostream>
 
+/**
+ * @brief This sample shows how to read from a serial port until the end of the buffer is reached.
+ *
+ * It first tries to get a list of available ports and then tries to connect to the first one.
+ */
+
 int main (int argc, char **argv) {
     std::vector<std::string> ports = sakurajin::getAvailablePorts();
 
