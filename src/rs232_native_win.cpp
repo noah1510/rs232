@@ -2,10 +2,8 @@
 
 #include "windows.h"
 
-#include <algorithm>
 #include <codecvt>
 #include <locale>
-#include <sstream>
 
 static inline std::string wstrToStr(const std::wstring& wstr) {
     if (wstr.empty()) {
@@ -52,6 +50,8 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate
     if (connStatus == connectionStatus::connected) {
         return connStatus;
     }
+
+    std::scoped_lock lock{dataAccessMutex};
 
     std::stringstream baudr_conf;
     baudr_conf << "baud=" << baudrate << " data=8 parity=N stop=1";
@@ -113,6 +113,8 @@ void sakurajin::RS232_native::disconnect() noexcept {
         return;
     }
 
+    std::scoped_lock lock{dataAccessMutex};
+
     CloseHandle(getCport(portHandle));
 
     delete &getCport(portHandle);
@@ -123,43 +125,44 @@ void sakurajin::RS232_native::disconnect() noexcept {
     connStatus = connectionStatus::disconnected;
 }
 
-ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool lock) {
+ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool block) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
-    int n  = 0;
-    length = std::clamp(length, 0, 4096);
+    return callWithOptionalLock(block, [this, data_location, length]() {
+        int n  = 0;
+        length = std::clamp(length, 0, 4096);
 
-    /* added the void pointer cast, otherwise gcc will complain about */
-    /* "warning: dereferencing type-punned pointer will break strict aliasing rules" */
-    ReadFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL);
-    return n;
+        auto success = ReadFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL);
+        return (ssize_t)(success ? n : -1);
+    });
 }
 
-ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool lock) {
+ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool block) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
-    int n = 0;
+    return callWithOptionalLock(block, [this, data_location, length]() {
+        int n  = 0;
+        length = std::clamp(length, 0, 4096);
 
-    if (WriteFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL)) {
-        return n;
-    }
-
-    return -1;
+        auto success = WriteFile(getCport(portHandle), data_location, length, (LPDWORD)((void*)&n), NULL);
+        return (ssize_t)(success ? n : -1);
+    });
 }
 
-int sakurajin::RS232_native::retrieveFlags() {
+ssize_t sakurajin::RS232_native::retrieveFlags(bool block) {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
-    DWORD status;
-    if (!GetCommModemStatus(getCport(portHandle), &status)) {
-        return -1;
-    }
-
-    return static_cast<int>(status);
+    return callWithOptionalLock(block, [this]() {
+        DWORD flags;
+        if (!GetCommModemStatus(getCport(portHandle), &flags)) {
+            return (ssize_t)(-1);
+        }
+        return (ssize_t)flags;
+    });
 }

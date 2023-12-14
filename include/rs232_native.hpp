@@ -21,6 +21,7 @@
 #include <ostream>
 #include <regex>
 #include <shared_mutex>
+#include <sstream>
 #include <string>
 #include <string_view>
 
