@@ -23,7 +23,7 @@ inline DCB& getDCB(void* DCBHandle) noexcept {
     return *static_cast<DCB*>(DCBHandle);
 }
 
-std::vector<std::string> sakurajin::getMatchingPorts(std::regex pattern) noexcept {
+std::vector<std::string> sakurajin::getMatchingPorts(const std::regex& pattern) noexcept {
     std::vector<std::string> allPorts;
     wchar_t                  lpTargetPath[5000];
 

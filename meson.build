@@ -5,10 +5,10 @@ project(
     default_options : [
         'cpp_std=c++17',
         'c_std=c17',
+        'warning_level=3',
     ],
     version : '2.0.0',
     meson_version : '>= 1.1'
-
 )
 
 # find the c and c++ compiler to check for working headers.
@@ -18,21 +18,21 @@ cxx = meson.get_compiler('cpp')
 # define the correct export macro on windows
 if target_machine.system() == 'windows'
     if get_option('buildtype') != 'static'
-        add_project_arguments('-DRS232_EXPORT_MACRO=__declspec(dllexport)', language: 'cpp')
+        add_project_arguments('-DRS232_EXPORT_MACRO=__declspec(dllexport)', language : 'cpp')
     else
-        add_project_arguments('-DRS232_EXPORT_MACRO=__declspec(dllimport)', language: 'cpp')
+        add_project_arguments('-DRS232_EXPORT_MACRO=__declspec(dllimport)', language : 'cpp')
     endif
-    
+
     if target_machine.cpu_family() == 'x86_64'
-        add_project_arguments('-D_AMD64_', language: 'cpp')
+        add_project_arguments('-D_AMD64_', language : 'cpp')
     elif target_machine.cpu_family() == 'x86'
-        add_project_arguments('-D_X86_', language: 'cpp')
+        add_project_arguments('-D_X86_', language : 'cpp')
     elif target_machine.cpu_family() == 'ia64'
-        add_project_arguments('-D_IA64_', language: 'cpp')
+        add_project_arguments('-D_IA64_', language : 'cpp')
     elif target_machine.cpu_family() == 'arm'
-        add_project_arguments('-D_ARM_', language: 'cpp')
+        add_project_arguments('-D_ARM_', language : 'cpp')
     elif target_machine.cpu_family() == 'aarch64'
-        add_project_arguments('-D_ARM64_', language: 'cpp')
+        add_project_arguments('-D_ARM64_', language : 'cpp')
     else
         if meson.is_cross_build()
             error('Unsupported cross compile cpu family:' + target_machine.cpu_family())
@@ -79,7 +79,7 @@ sources = [
 
 # check if the c++ headers exist and work
 foreach header_name : cpp_headers
-    cxx.check_header(header_name, required: true)
+    cxx.check_header(header_name, required : true)
 endforeach
 
 #extra linker args
@@ -91,7 +91,7 @@ if host_machine.system() == 'windows'
     sources += 'src/rs232_native_win.cpp'
 
     foreach header_name : windows_c_headers
-        cc.check_header(header_name, required: true)
+        cc.check_header(header_name, required : true)
     endforeach
 
 else
@@ -99,7 +99,7 @@ else
     sources += 'src/rs232_native_linux.cpp'
 
     foreach header_name : unix_c_headers
-        cc.check_header(header_name, required: true)
+        cc.check_header(header_name, required : true)
     endforeach
 endif
 
@@ -108,12 +108,12 @@ incdir = include_directories('include')
 
 # this defines the library that should be compiled and all its dependencies
 rs232 = library(
-    'rs232', 
-    sources, 
-    version : meson.project_version(), 
+    'rs232',
+    sources,
+    version : meson.project_version(),
     soversion : '0',
     include_directories : incdir,
-    link_args: extra_linker_args,
+    link_args : extra_linker_args,
     install : true,
 )
 
@@ -121,11 +121,11 @@ rs232 = library(
 rs232_dep = declare_dependency(
     include_directories : incdir,
     link_with : rs232,
-    version: meson.project_version(),
+    version : meson.project_version(),
 )
 
 
-build_sample = get_option('build_sample').enable_auto_if(not meson.is_subproject() ).enabled()
+build_sample = get_option('build_sample').enable_auto_if(not meson.is_subproject()).enabled()
 
 if build_sample
     message('Building sample programs')
@@ -138,12 +138,12 @@ if build_sample
     foreach sample_program : sample_src
 
         exe = executable(
-            sample_program, 
+            sample_program,
             'samples/' + sample_program + '.cpp',
-            link_args: extra_linker_args,
-            dependencies: rs232_dep
+            link_args : extra_linker_args,
+            dependencies : rs232_dep
         )
-        
+
     endforeach
 
 endif
