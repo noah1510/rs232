@@ -57,17 +57,20 @@ cpp_headers = [
     'algorithm',
     'atomic',
     'chrono',
-    'filesystem',
-    'iostream',
     'climits',
+    'filesystem',
+    'functional',
+    'future',
+    'iostream',
     'memory',
     'ostream',
+    'regex',
     'shared_mutex',
     'sstream',
     'string',
     'string_view',
     'tuple',
-    'vector',
+    'vector'
 ]
 
 # The array containing all the sources that will be compiled
@@ -106,6 +109,9 @@ endif
 # add the include directory, so that the compiler can find the header file
 incdir = include_directories('include')
 
+# now that async is used in the library, 'threads' is a required dependency
+deps = [dependency('threads')]
+
 # this defines the library that should be compiled and all its dependencies
 rs232 = library(
     'rs232',
@@ -114,6 +120,7 @@ rs232 = library(
     soversion : '0',
     include_directories : incdir,
     link_args : extra_linker_args,
+    dependencies : deps,
     install : true,
 )
 
@@ -121,6 +128,7 @@ rs232 = library(
 rs232_dep = declare_dependency(
     include_directories : incdir,
     link_with : rs232,
+    dependencies : deps,
     version : meson.project_version(),
 )
 
