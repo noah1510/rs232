@@ -46,11 +46,11 @@ namespace sakurajin {
         std::atomic<bool> stopThread = false;
 
         std::string       readBuffer;
-        std::shared_mutex readBufferMutex;
+        std::timed_mutex  readBufferMutex;
         std::atomic<bool> readBufferHasData = false;
 
         std::string       writeBuffer;
-        std::shared_mutex writeBufferMutex;
+        std::timed_mutex  writeBufferMutex;
         std::atomic<bool> writeBufferHasData = false;
 
         /**
@@ -153,7 +153,7 @@ namespace sakurajin {
          * @return std::string the content of the read buffer
          */
         [[nodiscard]] [[maybe_unused]]
-        std::string&& retrieveReadBuffer();
+        std::string retrieveReadBuffer();
 
         /**
          * @brief load the read buffer and return the first match with a regex
@@ -166,7 +166,7 @@ namespace sakurajin {
          * @return std::string the first match of the read buffer
          */
         [[nodiscard]] [[maybe_unused]]
-        std::string&& retrieveFirstMatch(const std::regex& pattern);
+        std::string retrieveFirstMatch(const std::regex& pattern);
 
         /**
          * @brief print a string to the currently connected device
@@ -178,7 +178,7 @@ namespace sakurajin {
          * @param text the text to send
          */
         [[maybe_unused]]
-        void Print(const std::string& text);
+        void Print(std::string text);
 
 
         /**

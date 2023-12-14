@@ -36,7 +36,7 @@ int main (int argc, char **argv) {
 
         while (true) {
             //do a small delay to prevent too much locking
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             //get the first match of the pattern in the read buffer
             auto result = rs232_interface.retrieveFirstMatch(pattern);
@@ -52,7 +52,7 @@ int main (int argc, char **argv) {
     }else{
         while(true){
             //do a small delay to prevent too much locking
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             //read the string and save the result in a variable
             auto readString = rs232_interface.retrieveReadBuffer();

@@ -113,51 +113,66 @@ void sakurajin::RS232::work() {
     // if there is something to write to the device, write it
     if (writeBufferHasData) {
         // lock the mutex to prevent the buffer from being changed while it is being moved
+        // try lock is not used here because the buffer is only locked for a short time
+        // both the print function and the work function only do a copy/move operation
         writeBufferMutex.lock();
         auto localWriteBuffer = std::move(writeBuffer);
         writeBufferHasData    = false;
         writeBufferMutex.unlock();
 
         // write the data
-        for (auto c : localWriteBuffer) {
-            if (transferDevice->writeRawData(&c, 1) < 1) {
-                std::cerr << "error writing [" << c << "] to serial port";
-            }
+        auto err = native::Print(transferDevice, localWriteBuffer);
+        if (err < 0) {
+            std::cerr << "Error while writing to the device: " << err << std::endl;
         }
     }
 
-    // read the data
-    char    IOBuf    = '\0';
-    int64_t dataSize = transferDevice->readRawData(&IOBuf, 1);
-    if (dataSize > 0) {
-        // if there is data, add it to the buffer and set the hasData flag
-        readBufferMutex.lock();
-        if (readBufferHasData) {
-            readBuffer.append(1, IOBuf);
+    // the read is a bit more complicated because the retrieve functions might block the code for a long time
+    // because of this the read is performed every call to work but first stored into a local static buffer.
+    static std::string queuedBuffer{};
+    char               IOBuf = '\0';
+    if (transferDevice->readRawData(&IOBuf, 1) > 0) {
+        if (queuedBuffer.empty()) {
+            queuedBuffer = std::string(1, IOBuf);
         } else {
-            readBuffer = std::string(1, IOBuf);
+            queuedBuffer.append(1, IOBuf);
+        }
+    }
+
+    // if there is data in the local buffer try locking the readBuffer mutex and add the data to the buffer
+    // if it takes too long to lock the mutex, try again during the next call to work
+    // this prevents long blocking of actual write operations while making sure no read data is lost.
+    if (!queuedBuffer.empty() && readBufferMutex.try_lock_for(1ms)) {
+        // if there is data, add it to the buffer
+        if (readBufferHasData) {
+            readBuffer.append(queuedBuffer);
+            queuedBuffer.clear();
+        } else {
+            // if there is no data, create a new buffer
+            readBuffer = std::move(queuedBuffer);
             readBuffer.reserve(10);
             readBufferHasData = true;
         }
+
         readBufferMutex.unlock();
     }
 }
 
 // io functions
-void sakurajin::RS232::Print(const std::string& text) {
+void sakurajin::RS232::Print(std::string text) {
     std::scoped_lock lock(writeBufferMutex);
 
     if (writeBufferHasData) {
         writeBuffer.append(text);
     } else {
-        writeBuffer        = text;
+        writeBuffer        = std::move(text);
         writeBufferHasData = true;
     }
 }
 
-std::string&& sakurajin::RS232::retrieveReadBuffer() {
+std::string sakurajin::RS232::retrieveReadBuffer() {
     if (!readBufferHasData) {
-        return std::string();
+        return std::string{};
     }
 
     std::scoped_lock lock(readBufferMutex);
@@ -166,21 +181,20 @@ std::string&& sakurajin::RS232::retrieveReadBuffer() {
     return std::move(readBuffer);
 }
 
-std::string&& sakurajin::RS232::retrieveFirstMatch(const std::regex& pattern) {
+std::string sakurajin::RS232::retrieveFirstMatch(const std::regex& pattern) {
     if (!readBufferHasData) {
-        return std::string();
+        return std::string{};
     }
 
     std::scoped_lock lock(readBufferMutex);
     std::smatch      s_match_result;
     std::regex_search(readBuffer, s_match_result, pattern);
     if (s_match_result.empty()) {
-        return std::string();
+        return std::string{};
     }
 
-    auto result = s_match_result.str();
-    readBuffer  = s_match_result.suffix();
-    return std::move(result);
+    readBuffer = s_match_result.suffix();
+    return s_match_result.str();
 }
 
 // device access functions
