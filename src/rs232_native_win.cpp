@@ -5,14 +5,19 @@
 #include <codecvt>
 #include <locale>
 
-static inline std::string wstrToStr(const std::wstring& wstr) noexcept {
-    if (wstr.empty()) {
+static inline std::string wstrToStr(const std::wstring& wideStr) noexcept {
+    if (wideStr.empty()) {
         return "";
     }
-    auto        size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-    std::string strTo{size_needed, 0};
-    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
-    return strTo;
+    int bufferSize = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (bufferSize <= 0 ){return "";}
+
+    // Create a buffer to store the converted string
+    std::string narrowStr(bufferSize, '\0');
+
+    // Perform the conversion
+    auto conversion = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, &narrowStr[0], bufferSize, nullptr, nullptr);
+    return (conversion > 0) ? narrowStr : "";
 }
 
 inline HANDLE& getCport(void* portHandle) noexcept {
