@@ -68,6 +68,11 @@ namespace sakurajin {
 #endif
     };
 
+#if defined(_MSC_VER)
+    #include <BaseTsd.h>
+    typedef SSIZE_T ssize_t;
+#endif
+    
     RS232_EXPORT_MACRO std::vector<std::string> getAvailablePorts() noexcept;
     RS232_EXPORT_MACRO std::vector<std::string> getMatchingPorts(const std::regex& pattern) noexcept;
 
