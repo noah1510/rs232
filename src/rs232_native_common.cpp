@@ -3,6 +3,8 @@
 
 #include "rs232_native.hpp"
 
+using namespace std::literals;
+
 sakurajin::RS232_native::RS232_native(std::string deviceName, Baudrate _baudrate, std::ostream& error_stream)
     : devname(std::move(deviceName)) {
     baudrate   = _baudrate;
@@ -71,4 +73,43 @@ std::vector<std::string> sakurajin::getAvailablePorts() noexcept {
     }
 
     return allPorts;
+}
+
+std::tuple<unsigned char, int> sakurajin::native::ReadNextChar(const std::shared_ptr<RS232_native>& transferDevice) {
+    return sakurajin::native::ReadNextChar(transferDevice, std::chrono::microseconds(1), true);
+}
+
+std::tuple<std::string, int> sakurajin::native::ReadNextMessage(const std::shared_ptr<RS232_native>& transferDevice) {
+    return sakurajin::native::ReadNextMessage(transferDevice, 1us, true);
+}
+
+std::tuple<std::string, int> sakurajin::native::ReadUntil(const std::shared_ptr<RS232_native>& transferDevice,
+                                                          const std::vector<unsigned char>&    conditions) {
+    return sakurajin::native::ReadUntil(transferDevice, conditions, 1us, true);
+}
+
+int sakurajin::native::Print(const std::shared_ptr<RS232_native>& transferDevice, const std::string& text) {
+
+    if (transferDevice == nullptr) {
+        return -1;
+    }
+
+    if (transferDevice->getConnectionStatus() != sakurajin::connectionStatus::connected) {
+        return -2;
+    }
+
+    for (auto c : text) {
+        // retry each character until it is written
+        int64_t writeRes;
+        do {
+            writeRes = transferDevice->writeRawData(&c, 1);
+
+            // if the connection was lost while writing, return
+            if (transferDevice->getConnectionStatus() != sakurajin::connectionStatus::connected) {
+                return -3;
+            }
+        } while (writeRes < 1);
+    }
+
+    return 0;
 }

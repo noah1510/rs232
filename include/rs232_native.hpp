@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <filesystem>
 #include <functional>
 #include <iostream>
@@ -24,6 +25,8 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <thread>
+#include <tuple>
 #include <vector>
 
 namespace sakurajin {
@@ -250,6 +253,167 @@ namespace sakurajin {
         [[nodiscard]]
         int64_t retrieveFlags(bool block = true) noexcept;
     };
+
+    /**
+     * @brief This namespace contains some external functions that operate on the RS232_native class
+     * They are not directly part of the class since they are abstractions in a way but they are still useful.
+     * Use these functions for convenient direct access to the RS232_native class.
+     *
+     * In version 1.x these were part of the RS232 wrapper class but they were moved here.
+     * This is because the wrapper class uses a new design where these functions no longer fit.
+     */
+    namespace native {
+
+        /**
+         * @brief reads until the next character is received or the waitTaime is over
+         *
+         * @param waitTime the duration that should be waited for a signal before stopping the function.
+         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
+         *
+         * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
+         * The return value is >= 0 if everything is okay and < 0 if something went wrong
+         */
+        template <class Rep = int64_t, class Period = std::ratio<1>>
+        [[nodiscard]] [[maybe_unused]]
+        std::tuple<unsigned char, int> ReadNextChar(const std::shared_ptr<RS232_native>& transferDevice,
+                                                    std::chrono::duration<Rep, Period>   waitTime,
+                                                    bool                                 ignoreTime = false) {
+            if (transferDevice == nullptr) {
+                return {'\0', -1};
+            }
+
+            if (transferDevice->getConnectionStatus() != sakurajin::connectionStatus::connected) {
+                return {'\0', -2};
+            }
+
+            auto startTime = std::chrono::high_resolution_clock::now();
+
+            char    IOBuf = '\0';
+            int64_t readLength;
+
+            do {
+                readLength = transferDevice->readRawData(&IOBuf, 1, false);
+
+                if (ignoreTime) {
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                    continue;
+                }
+
+                if (std::chrono::high_resolution_clock::now() - startTime > waitTime) {
+                    return {'\0', -3};
+                }
+            } while (readLength < 1);
+
+            return {IOBuf, 0};
+        }
+
+        /**
+         * @brief read the interface until one of the stop conditions is reached or the waitTaime is over
+         * The waitTime is the time the code will wait for each next character. If the delay between the
+         * characters is too long the function will return an error.
+         *
+         * @param waitTime the duration that should be waited for a signal before stopping the function.
+         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
+         *
+         * @param conditions a vector containing all the stop conditions.
+         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
+        template <class Rep = int64_t, class Period = std::ratio<1>>
+        [[nodiscard]] [[maybe_unused]]
+        std::tuple<std::string, int> ReadUntil(const std::shared_ptr<RS232_native>& transferDevice,
+                                               const std::vector<unsigned char>&    conditions,
+                                               std::chrono::duration<Rep, Period>   waitTime,
+                                               bool                                 ignoreTime = false) {
+            if (transferDevice == nullptr) {
+                return {"", -1};
+            }
+
+            if (transferDevice->getConnectionStatus() != sakurajin::connectionStatus::connected) {
+                return {"", -2};
+            }
+
+            std::string message;
+            int64_t     errCode  = 0;
+            char        nextChar = '\n';
+            bool        stop     = false;
+
+            while (!stop) {
+                // read the next char and append if there was no error
+                std::tie(nextChar, errCode) = ReadNextChar(transferDevice, waitTime, ignoreTime);
+
+                if (errCode < 0) {
+                    return {"", -3};
+                }
+                message += nextChar;
+
+                // check if a stop condition is met
+                for (auto cond : conditions) {
+                    if (cond == nextChar) {
+                        stop = true;
+                        break;
+                    }
+                }
+            }
+
+            return {message, 0};
+        }
+
+        /**
+         * @brief reads the interface until a newline (\n) is received or the waitTime is over
+         * The waitTime is the time the code will wait for each next character. If the delay between the
+         * characters is too long the function will return an error.
+         *
+         * @param waitTime the duration that should be waited for a signal before stopping the function.
+         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
+         *
+         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
+        template <class Rep = int64_t, class Period = std::ratio<1>>
+        [[nodiscard]] [[maybe_unused]]
+        std::tuple<std::string, int> ReadNextMessage(const std::shared_ptr<RS232_native>& transferDevice,
+                                                     std::chrono::duration<Rep, Period>   waitTime,
+                                                     bool                                 ignoreTime = false) {
+            return ReadUntil(transferDevice, {'\n'}, waitTime, ignoreTime);
+        }
+
+        /**
+         * @brief Directly output a string to the device.
+         * The string is written to the device and the function returns immediately after that.
+         * @note this function is blocking and will wait until a write can actually be performed.
+         * @param transferDevice The device that should be used for the transfer
+         * @param text The text that should be written to the device
+         * @return negative if an error occurred
+         */
+        [[maybe_unused]]
+        RS232_EXPORT_MACRO int Print(const std::shared_ptr<RS232_native>& transferDevice, const std::string& text);
+
+        /**
+         * @brief reads until the next character is received
+         *
+         * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
+         * The return value is >= 0 if everything is okay and < 0 if something went wrong
+         */
+        [[nodiscard]] [[maybe_unused]]
+        RS232_EXPORT_MACRO std::tuple<unsigned char, int> ReadNextChar(const std::shared_ptr<RS232_native>& transferDevice);
+
+        /**
+         * @brief reads the interface until a newline (\n) is received
+         *
+         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
+        [[nodiscard]] [[maybe_unused]]
+        RS232_EXPORT_MACRO std::tuple<std::string, int> ReadNextMessage(const std::shared_ptr<RS232_native>& transferDevice);
+
+        /**
+         * @brief read the interface until one of the stop conditions is reached
+         *
+         * @param conditions a vector containing all the stop conditions.
+         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
+         */
+        [[nodiscard]] [[maybe_unused]]
+        RS232_EXPORT_MACRO std::tuple<std::string, int> ReadUntil(const std::shared_ptr<RS232_native>& transferDevice,
+                                                                  const std::vector<unsigned char>&    conditions);
+    } // namespace native
 
 } // namespace sakurajin
 

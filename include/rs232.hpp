@@ -3,8 +3,7 @@
 
 #include "rs232_native.hpp"
 
-#include <chrono>
-#include <tuple>
+#include <future>
 
 namespace sakurajin {
 
@@ -37,6 +36,30 @@ namespace sakurajin {
          * available on the current OS.
          */
         std::atomic<size_t> currentDevice = 0;
+
+        std::shared_mutex deviceMutex;
+
+        /**
+         * @brief The work thread that actually does most of the work
+         */
+        std::future<void> workThread;
+        std::atomic<bool> stopThread = false;
+
+        std::string       readBuffer;
+        std::shared_mutex readBufferMutex;
+        std::atomic<bool> readBufferHasData = false;
+
+        std::string       writeBuffer;
+        std::shared_mutex writeBufferMutex;
+        std::atomic<bool> writeBufferHasData = false;
+
+        /**
+         * @brief The function that is executed by the work thread
+         * It performs the actual read/write operations constantly in the background.
+         * This function only does one loop iteration and then returns.
+         * It should be called in a loop to keep the query system running.
+         */
+        void work();
 
       public:
         /**
@@ -79,126 +102,6 @@ namespace sakurajin {
         ~RS232();
 
         /**
-         * @brief Get a pointer to a native device
-         * If the index is not a valid index the current device will be returned.
-         *
-         * @param index the index of the device that should be returned
-         */
-        [[nodiscard]] [[maybe_unused]]
-        std::shared_ptr<RS232_native> getNativeDevice(size_t index = -1) const;
-
-        /**
-         * @brief Get the number of devices that are added to this class
-         * @return The size of the list of devices
-         */
-        [[nodiscard]] [[maybe_unused]]
-        size_t getDeviceCount() const;
-
-        /**
-         * @brief Checks if the connection was started successfully
-         *
-         * @return true the connection is established as expected
-         * @return false there was an error while initializing the connection or some of the settings are not valid
-         */
-        [[nodiscard]] [[maybe_unused]]
-        bool IsAvailable(size_t index = -1) const;
-
-        /**
-         * @brief Get the name of the port used for this RS232 connection
-         * If the index is not a valid index the current device will be checked.
-         *
-         * @param index the index of the device that should be used
-         */
-        [[nodiscard]] [[maybe_unused]]
-        std::string_view GetDeviceName(size_t index = -1) const;
-
-        /**
-         * @brief reads until the next character is received
-         *
-         * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
-         * The return value is >= 0 if everything is okay and < 0 if something went wrong
-         */
-        [[nodiscard]] [[maybe_unused]]
-        std::tuple<unsigned char, int> ReadNextChar();
-
-        /**
-         * @brief reads until the next character is received or the waitTaime is over
-         *
-         * @param waitTime the duration that should be waited for a signal before stopping the function.
-         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
-         *
-         * @return std::tuple<unsigned char, int> this tuple contains the wanted return data and an error code in case something went wrong
-         * The return value is >= 0 if everything is okay and < 0 if something went wrong
-         */
-        template <class Rep = int64_t, class Period = std::ratio<1>>
-        [[nodiscard]] [[maybe_unused]]
-        std::tuple<unsigned char, int> ReadNextChar(std::chrono::duration<Rep, Period> waitTime,
-                                                    bool                               ignoreTime     = false,
-                                                    std::shared_ptr<RS232_native>      transferDevice = nullptr);
-
-        /**
-         * @brief reads the interface until a newline (\n) is received
-         *
-         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
-         */
-        [[nodiscard]] [[maybe_unused]]
-        std::tuple<std::string, int> ReadNextMessage();
-
-        /**
-         * @brief reads the interface until a newline (\n) is received or the waitTime is over
-         * The waitTime is the time the code will wait for each next character. If the delay between the
-         * characters is too long the function will return an error.
-         *
-         * @param waitTime the duration that should be waited for a signal before stopping the function.
-         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
-         *
-         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
-         */
-        template <class Rep = int64_t, class Period = std::ratio<1>>
-        [[nodiscard]] [[maybe_unused]]
-        std::tuple<std::string, int> ReadNextMessage(std::chrono::duration<Rep, Period> waitTime, bool ignoreTime = false);
-
-        /**
-         * @brief read the interface until one of the stop conditions is reached
-         *
-         * @param conditions a vector containing all the stop conditions.
-         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
-         */
-        [[nodiscard]] [[maybe_unused]]
-        std::tuple<std::string, int> ReadUntil(const std::vector<unsigned char>& conditions);
-
-        /**
-         * @brief read the interface until one of the stop conditions is reached or the waitTaime is over
-         * The waitTime is the time the code will wait for each next character. If the delay between the
-         * characters is too long the function will return an error.
-         *
-         * @param waitTime the duration that should be waited for a signal before stopping the function.
-         * @param ignoreTime true if the duration value should be ignored (the same as no parameter)
-         *
-         * @param conditions a vector containing all the stop conditions.
-         * @return std::tuple<std::string, int> this tuple contains the wanted return data and an error code in case something went wrong
-         */
-        template <class Rep = int64_t, class Period = std::ratio<1>>
-        [[nodiscard]] [[maybe_unused]]
-        std::tuple<std::string, int>
-        ReadUntil(const std::vector<unsigned char>& conditions, std::chrono::duration<Rep, Period> waitTime, bool ignoreTime = false);
-
-        /**
-         * @brief print a string to the currently connected device
-         * @param text the test to send
-         */
-        [[maybe_unused]]
-        void Print(const std::string& text, std::ostream& errorStream = std::cerr);
-
-        /**
-         * @brief close the connection to the device.
-         * @warning this disables all following transactions to the device.
-         *
-         */
-        [[deprecated("use DisconnectAll() instead")]]
-        void Close();
-
-        /**
          * @brief connect to the first available device
          *
          * @return true if the connection was established successfully
@@ -215,6 +118,70 @@ namespace sakurajin {
         void DisconnectAll();
 
         /**
+         * @brief Get a pointer to a native device
+         * If the index is not a valid index the current device will be returned.
+         *
+         * @param index the index of the device that should be returned
+         */
+        [[nodiscard]] [[maybe_unused]]
+        std::shared_ptr<RS232_native> getNativeDevice(size_t index) const;
+
+        /**
+         * @brief Get a pointer to the current native device
+         * This is the same as calling getNativeDevice(currentDevice) but is more convenient since its used more often.
+         */
+        [[nodiscard]] [[maybe_unused]]
+        std::shared_ptr<RS232_native> getCurrentDevice() const;
+
+        /**
+         * @brief check if the current device is available
+         * @return bool true if the current device is connected and ready to use
+         */
+        [[nodiscard]] [[maybe_unused]]
+        bool IsAvailable() const;
+
+        /**
+         * @brief Get the number of devices that are added to this class
+         * @return The size of the list of devices
+         */
+        [[nodiscard]] [[maybe_unused]]
+        size_t getDeviceCount() const;
+
+        /**
+         * @brief Empty the read buffer and return its content
+         * @warning the read buffer will be cleared after this function is called.
+         * @return std::string the content of the read buffer
+         */
+        [[nodiscard]] [[maybe_unused]]
+        std::string&& retrieveReadBuffer();
+
+        /**
+         * @brief load the read buffer and return the first match with a regex
+         * This function uses the std::regex_search function to find the first match of the read buffer.
+         * If no match is found an empty string is returned.
+         * @note this function clears the read buffer until the end of the match.
+         * If the buffer contains "Hello World!" and the pattern is "World" the buffer will be cleared until the end of the match.
+         * The buffer will then contain "!". Everything in front of the match will be discarded.
+         * @param pattern the regex pattern that should be used
+         * @return std::string the first match of the read buffer
+         */
+        [[nodiscard]] [[maybe_unused]]
+        std::string&& retrieveFirstMatch(const std::regex& pattern);
+
+        /**
+         * @brief print a string to the currently connected device
+         * This function adds the string to the write buffer and then returns.
+         * The write buffer is then written to the device in the background by the work thread.
+         * Because of this the actual write operation might be delayed.
+         * For a more immediate write operation use the native device directly.
+         *
+         * @param text the text to send
+         */
+        [[maybe_unused]]
+        void Print(const std::string& text);
+
+
+        /**
          * @brief check if the clear to send flag is set
          *
          * @return true if the flag is set
@@ -222,10 +189,34 @@ namespace sakurajin {
          */
         [[nodiscard]] [[maybe_unused]] [[deprecated("get the native device and retrieve the information from there")]]
         bool IsCTSEnabled() const;
+
+        /**
+         * @brief Checks if the connection was started successfully
+         *
+         * @return true the connection is established as expected
+         * @return false there was an error while initializing the connection or some of the settings are not valid
+         */
+        [[nodiscard]] [[maybe_unused]] [[deprecated("get the native device and retrieve the information from there")]]
+        bool IsAvailable(size_t index) const;
+
+        /**
+         * @brief Get the name of the port used for this RS232 connection
+         * If the index is not a valid index the current device will be checked.
+         *
+         * @param index the index of the device that should be used
+         */
+        [[nodiscard]] [[maybe_unused]] [[deprecated("use getNativeDevice(index)->getDeviceName() instead")]]
+        std::string_view GetDeviceName(size_t index) const;
+
+        /**
+         * @brief close the connection to the device.
+         * @warning this disables all following transactions to the device.
+         *
+         */
+        [[deprecated("use DisconnectAll() instead")]]
+        void Close();
     };
 
 } // namespace sakurajin
-
-#include "rs232_template_implementations.hpp"
 
 #endif // SAKURAJIN_RS232_HPP_INCLUDED
