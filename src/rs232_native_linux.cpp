@@ -94,7 +94,7 @@ sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, 
     return connStatus;
 }
 
-ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool lock) noexcept {
+int64_t sakurajin::RS232_native::readRawData(char* data_location, int length, bool block) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
@@ -108,15 +108,16 @@ ssize_t sakurajin::RS232_native::readRawData(char* data_location, int length, bo
 
     length = std::clamp(length, 0, limit);
 
-    return callWithOptionalLock(lock, [this, data_location, length]() { return read(getPort(portHandle), data_location, length); });
+    return callWithOptionalLock<ssize_t>([this, data_location, length]() { return read(getPort(portHandle), data_location, length); },
+                                         block);
 }
 
-ssize_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool lock) noexcept {
+int64_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool block) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
-    return callWithOptionalLock(lock, [this, data_location, length]() { return write(getPort(portHandle), data_location, length); });
+    return callWithOptionalLock<ssize_t>([this, data_location, length]() { return write(getPort(portHandle), data_location, length); }, block);
 }
 
 void sakurajin::RS232_native::disconnect() noexcept {
@@ -140,16 +141,18 @@ void sakurajin::RS232_native::disconnect() noexcept {
     portConfig = nullptr;
 }
 
-ssize_t sakurajin::RS232_native::retrieveFlags(bool block) noexcept {
+int64_t sakurajin::RS232_native::retrieveFlags(bool block) noexcept {
     if (connStatus != connectionStatus::connected) {
         return -1;
     }
 
-    return callWithOptionalLock(block, [this]() {
-        ssize_t status;
-        if (ioctl(getPort(portHandle), TIOCMGET, &status) < 0) {
-            return (ssize_t)(-1);
-        }
-        return status;
-    });
+    return callWithOptionalLock<ssize_t>(
+        [this]() {
+            int64_t status;
+            if (ioctl(getPort(portHandle), TIOCMGET, &status) < 0) {
+                return (int64_t)(-1);
+            }
+            return status;
+        },
+        block);
 }

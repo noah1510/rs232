@@ -52,7 +52,6 @@
     #ifndef B256000
         #define B256000 256000
     #endif
-
 #endif
 
 namespace sakurajin {

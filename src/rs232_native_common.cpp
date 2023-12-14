@@ -25,7 +25,7 @@ bool sakurajin::RS232_native::checkForFlag(sakurajin::portStatusFlags flag, bool
     if (flags < 0) {
         return false;
     }
-    return (flags & static_cast<ssize_t>(flag)) != 0;
+    return (flags & static_cast<int64_t>(flag)) != 0;
 }
 
 std::vector<std::string> sakurajin::getAvailablePorts() noexcept {

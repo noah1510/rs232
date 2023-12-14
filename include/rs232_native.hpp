@@ -68,11 +68,6 @@ namespace sakurajin {
 #endif
     };
 
-#if defined(_MSC_VER)
-    #include <BaseTsd.h>
-    typedef SSIZE_T ssize_t;
-#endif
-    
     RS232_EXPORT_MACRO std::vector<std::string> getAvailablePorts() noexcept;
     RS232_EXPORT_MACRO std::vector<std::string> getMatchingPorts(const std::regex& pattern) noexcept;
 
@@ -123,6 +118,9 @@ namespace sakurajin {
          */
         std::shared_mutex dataAccessMutex;
 
+        template <typename retVal>
+        using encapsulatedFunction = std::function<retVal()>;
+
         /**
          * @brief A method to make a function call with a lock on the mutex
          * This method is used to prevent code duplication.
@@ -135,7 +133,8 @@ namespace sakurajin {
          * @param func The function that should be called
          * @return ssize_t The return value of the function or -1 if something went wrong
          */
-        ssize_t callWithOptionalLock(bool block, const std::function<ssize_t()>& func) {
+        template <typename retT>
+        int64_t callWithOptionalLock(const encapsulatedFunction<retT>& func, bool block = true) {
             // lock the mutex if the lock parameter is true
             // otherwise exit if the lock cannot be acquired
             if (block) {
@@ -147,7 +146,7 @@ namespace sakurajin {
             // call the function and unlock the mutex before passing the return value.
             auto retVal = func();
             dataAccessMutex.unlock();
-            return retVal;
+            return static_cast<int64_t>(retVal);
         }
 
       public:
@@ -187,7 +186,7 @@ namespace sakurajin {
          * @return int the number of bytes that were read from the port
          */
         [[nodiscard]]
-        ssize_t readRawData(char* data_location, int length, bool block = true) noexcept;
+        int64_t readRawData(char* data_location, int length, bool block = true) noexcept;
 
         /**
          * @brief The platform specific function to write a string to the port
@@ -197,7 +196,7 @@ namespace sakurajin {
          * @return int the number of bytes that were written to the port
          */
         [[nodiscard]]
-        ssize_t writeRawData(char* data_location, int length, bool block = true) noexcept;
+        int64_t writeRawData(char* data_location, int length, bool block = true) noexcept;
 
         /**
          * @brief Checks if the connection was started successfully
@@ -230,7 +229,7 @@ namespace sakurajin {
          * @return int the flags that are set
          */
         [[nodiscard]]
-        ssize_t retrieveFlags(bool block = true) noexcept;
+        int64_t retrieveFlags(bool block = true) noexcept;
     };
 
 } // namespace sakurajin
