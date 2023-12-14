@@ -54,10 +54,10 @@ sakurajin::RS232::RS232(const std::vector<std::string>& deviceNames, sakurajin::
     // add all devices to the list
     rs232Devices.reserve(deviceNames.size());
     for (const auto& deviceName : deviceNames) {
-        try{
+        try {
             rs232Devices.emplace_back(std::make_shared<sakurajin::RS232_native>(deviceName, baudrate, errorStream));
-        }catch(...){
-            for(auto& device : rs232Devices){
+        } catch (...) {
+            for (auto& device : rs232Devices) {
                 device->disconnect();
             }
             rs232Devices.clear();
@@ -84,13 +84,18 @@ void sakurajin::RS232::Close() {
 }
 
 bool sakurajin::RS232::Connect() {
-    if(rs232Devices.empty()){
+    if (rs232Devices.empty()) {
         return false;
     }
 
     // return early if the current device is already connected
     if (rs232Devices[currentDevice]->getConnectionStatus() == sakurajin::connectionStatus::connected) {
         return true;
+    }
+
+    // connect all devices
+    for (auto& device : rs232Devices) {
+        device->connect();
     }
 
     // find the first connected device or a device that can be connected to but is disconnected at the moment
@@ -100,16 +105,16 @@ bool sakurajin::RS232::Connect() {
                 currentDevice = i;
                 return true;
             case sakurajin::connectionStatus::disconnected:
+                currentDevice = i;
             case sakurajin::connectionStatus::otherError:
             case sakurajin::connectionStatus::portNotFound:
-                currentDevice = i;
                 break;
             default:
                 throw std::runtime_error("unknown connection status");
         }
     }
 
-    //no device was connected successfully so return false
+    // no device was connected successfully so return false
     return false;
 }
 

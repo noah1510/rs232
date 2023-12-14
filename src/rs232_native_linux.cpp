@@ -30,7 +30,7 @@ std::vector<std::string> sakurajin::getMatchingPorts(const std::regex& pattern) 
     return allPorts;
 }
 
-sakurajin::connectionStatus sakurajin::RS232_native::connect(Baudrate baudrate, std::ostream& error_stream) noexcept {
+sakurajin::connectionStatus sakurajin::RS232_native::connect(std::ostream& error_stream) noexcept {
     if (connStatus == connectionStatus::connected) {
         return connStatus;
     }
@@ -117,7 +117,8 @@ int64_t sakurajin::RS232_native::writeRawData(char* data_location, int length, b
         return -1;
     }
 
-    return callWithOptionalLock<ssize_t>([this, data_location, length]() { return write(getPort(portHandle), data_location, length); }, block);
+    return callWithOptionalLock<ssize_t>([this, data_location, length]() { return write(getPort(portHandle), data_location, length); },
+                                         block);
 }
 
 void sakurajin::RS232_native::disconnect() noexcept {

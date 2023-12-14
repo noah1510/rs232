@@ -24,6 +24,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace sakurajin {
     /**
@@ -113,6 +114,12 @@ namespace sakurajin {
         std::atomic<void*> portConfig = nullptr;
 
         /**
+         * @brief The baudrate this device is connected with.
+         * This is used in the reconnect method to reestablish the connection with the same baudrate as before.
+         */
+        std::atomic<Baudrate> baudrate = Baudrate::baud9600;
+
+        /**
          * @brief The mutex that is used to prevent multiple threads from accessing the port at the same time
          *
          */
@@ -165,11 +172,23 @@ namespace sakurajin {
 
         /**
          * @brief Establish a connection to the port
-         * @note this is always called by the constructor so by default there should be a connection
+         * this is always called by the constructor so by default there should be a connection
          * @note This operation can take some time since the mutex has to be locked.
+         * @note if the connection is already established this will exit early. To force a reconnect use disconnect() first.
+         *
+         * @param error_stream the stream where the error messages should be written to
          * @return connectionStatus the status of the connection
          */
-        connectionStatus connect(Baudrate Rate, std::ostream& error_stream = std::cerr) noexcept;
+        connectionStatus connect(std::ostream& error_stream = std::cerr) noexcept;
+
+        /**
+         * @brief Change the baudrate of the connection
+         * This function disconnects the port and reconnects it with the new baudrate.
+         * @param Rate the new baudrate
+         * @param error_stream the stream where the error messages should be written to
+         * @return true the baudrate was changed and a connection was established
+         */
+        bool changeBaudrate(Baudrate Rate, std::ostream& error_stream = std::cerr) noexcept;
 
         /**
          * @brief disconnects the port and prevents further access

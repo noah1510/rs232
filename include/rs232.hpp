@@ -3,18 +3,19 @@
 
 #include "rs232_native.hpp"
 
-#include <algorithm>
 #include <chrono>
-#include <iostream>
-#include <regex>
-#include <sstream>
-#include <string>
-#include <string_view>
 #include <tuple>
-#include <vector>
 
 namespace sakurajin {
 
+    /**
+     * @brief The RS232 class is a wrapper class for the RS232_native class.
+     * It can contain many RS232_native objects and allows the user to switch between them.
+     * The raw read/write functions are abstracted into more practical interfaces.
+     *
+     * Just like the RS232_native class this class is supposed to be thread safe.
+     * If something is not then that is treated as a bug.
+     */
     class RS232_EXPORT_MACRO RS232 {
       private:
         /**
@@ -197,9 +198,19 @@ namespace sakurajin {
         [[deprecated("use DisconnectAll() instead")]]
         void Close();
 
+        /**
+         * @brief connect to the first available device
+         *
+         * @return true if the connection was established successfully
+         * @return false if the connection could not be established
+         */
         [[maybe_unused]]
         bool Connect();
 
+        /**
+         * @brief disconnect from all devices
+         * If no device is connected this will exit early otherwise it will disconnect all devices.
+         */
         [[maybe_unused]]
         void DisconnectAll();
 
@@ -209,7 +220,7 @@ namespace sakurajin {
          * @return true if the flag is set
          * @return false if the flag is not set
          */
-        [[nodiscard]] [[maybe_unused]]
+        [[nodiscard]] [[maybe_unused]] [[deprecated("get the native device and retrieve the information from there")]]
         bool IsCTSEnabled() const;
     };
 

@@ -10,7 +10,9 @@ static inline std::string wstrToStr(const std::wstring& wideStr) noexcept {
         return "";
     }
     int bufferSize = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
-    if (bufferSize <= 0 ){return "";}
+    if (bufferSize <= 0) {
+        return "";
+    }
 
     // Create a buffer to store the converted string
     std::string narrowStr(bufferSize, '\0');
@@ -51,7 +53,7 @@ std::vector<std::string> sakurajin::getMatchingPorts(const std::regex& pattern) 
     return allPorts;
 }
 
-sakurajin::connectionStatus sakurajin::RS232_native::connect(sakurajin::Baudrate baudrate, std::ostream& error_stream) noexcept {
+sakurajin::connectionStatus sakurajin::RS232_native::connect(std::ostream& error_stream) noexcept {
     if (connStatus == connectionStatus::connected) {
         return connStatus;
     }
@@ -135,13 +137,15 @@ int64_t sakurajin::RS232_native::readRawData(char* data_location, int length, bo
         return -1;
     }
 
-    return callWithOptionalLock<int64_t>([this, data_location, length]() {
-        int n  = 0;
-        auto local_len = std::clamp(length, 0, 4096);
+    return callWithOptionalLock<int64_t>(
+        [this, data_location, length]() {
+            int  n         = 0;
+            auto local_len = std::clamp(length, 0, 4096);
 
-        auto success = ReadFile(getCport(portHandle), data_location, local_len, (LPDWORD)((void*)&n), NULL);
-        return (int64_t)(success ? n : -1);
-    }, block);
+            auto success = ReadFile(getCport(portHandle), data_location, local_len, (LPDWORD)((void*)&n), NULL);
+            return (int64_t)(success ? n : -1);
+        },
+        block);
 }
 
 int64_t sakurajin::RS232_native::writeRawData(char* data_location, int length, bool block) noexcept {
@@ -149,13 +153,15 @@ int64_t sakurajin::RS232_native::writeRawData(char* data_location, int length, b
         return -1;
     }
 
-    return callWithOptionalLock<int64_t>([this, data_location, length]() {
-        int n  = 0;
-        auto local_len = std::clamp(length, 0, 4096);
+    return callWithOptionalLock<int64_t>(
+        [this, data_location, length]() {
+            int  n         = 0;
+            auto local_len = std::clamp(length, 0, 4096);
 
-        auto success = WriteFile(getCport(portHandle), data_location, local_len, (LPDWORD)((void*)&n), NULL);
-        return (int64_t)(success ? n : -1);
-    }, block);
+            auto success = WriteFile(getCport(portHandle), data_location, local_len, (LPDWORD)((void*)&n), NULL);
+            return (int64_t)(success ? n : -1);
+        },
+        block);
 }
 
 int64_t sakurajin::RS232_native::retrieveFlags(bool block) noexcept {
@@ -163,11 +169,13 @@ int64_t sakurajin::RS232_native::retrieveFlags(bool block) noexcept {
         return -1;
     }
 
-    return callWithOptionalLock<int64_t>([this](){
-        DWORD flags;
-        if (!GetCommModemStatus(getCport(portHandle), &flags)) {
-            return (int64_t)(-1);
-        }
-        return (int64_t)flags;
-    }, block);
+    return callWithOptionalLock<int64_t>(
+        [this]() {
+            DWORD flags;
+            if (!GetCommModemStatus(getCport(portHandle), &flags)) {
+                return (int64_t)(-1);
+            }
+            return (int64_t)flags;
+        },
+        block);
 }

@@ -3,13 +3,20 @@
 
 #include "rs232_native.hpp"
 
-sakurajin::RS232_native::RS232_native(std::string deviceName, Baudrate baudrate, std::ostream& error_stream)
+sakurajin::RS232_native::RS232_native(std::string deviceName, Baudrate _baudrate, std::ostream& error_stream)
     : devname(std::move(deviceName)) {
-    connStatus = connect(baudrate, error_stream);
+    baudrate   = _baudrate;
+    connStatus = connect(error_stream);
 }
 
 sakurajin::RS232_native::~RS232_native() {
     disconnect();
+}
+
+bool sakurajin::RS232_native::changeBaudrate(sakurajin::Baudrate Rate, std::ostream& error_stream) noexcept {
+    disconnect();
+    baudrate = Rate;
+    return connect(error_stream) == connectionStatus::connected;
 }
 
 sakurajin::connectionStatus sakurajin::RS232_native::getConnectionStatus() noexcept {
