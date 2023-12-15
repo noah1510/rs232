@@ -169,6 +169,21 @@ namespace sakurajin {
         std::string retrieveFirstMatch(const std::regex& pattern);
 
         /**
+         * @brief load the read buffer and return all matches with a regex
+         * This does essentially the same as retrieveFirstMatch but returns all matches instead of just the first one.
+         * If care about more than one result use this function since it is more efficient than calling retrieveFirstMatch multiple
+         * times. If no match is found or no data is in the read buffer, an empty vector is returned.
+         * @note this function clears the read buffer until the end of the last match.
+         * @note The read buffer is not updated during this function call. If the read buffer is large and many pattern matches are
+         * found this function might take a long time to complete. During this time more data might be queued for adding to the
+         * read buffer. This data will not be considered by this function.
+         * @param pattern the regex pattern that should be used
+         * @return std::vector<std::string> all matches of the read buffer
+         */
+        [[nodiscard]] [[maybe_unused]]
+        std::vector<std::string> retrieveAllMatches(const std::regex& pattern);
+
+        /**
          * @brief print a string to the currently connected device
          * This function adds the string to the write buffer and then returns.
          * The write buffer is then written to the device in the background by the work thread.

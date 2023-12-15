@@ -197,6 +197,28 @@ std::string sakurajin::RS232::retrieveFirstMatch(const std::regex& pattern) {
     return s_match_result.str();
 }
 
+std::vector<std::string> sakurajin::RS232::retrieveAllMatches(const std::regex& pattern) {
+    if (!readBufferHasData) {
+        return std::vector<std::string>{};
+    }
+
+    std::scoped_lock lock(readBufferMutex);
+
+    std::string              searchString = readBuffer;
+    std::smatch              curr_match;
+    std::vector<std::string> matches{};
+
+    std::regex_search(searchString, curr_match, pattern);
+    while(!curr_match.empty()){
+        matches.emplace_back(curr_match.str());
+        searchString = curr_match.suffix();
+        std::regex_search(searchString, curr_match, pattern);
+    }
+
+    readBuffer = searchString;
+    return matches;
+}
+
 // device access functions
 std::shared_ptr<sakurajin::RS232_native> sakurajin::RS232::getNativeDevice(size_t index) const {
     if (rs232Devices.empty()) {
